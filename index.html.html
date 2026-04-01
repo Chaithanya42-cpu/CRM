@@ -1,0 +1,3021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrandIntelligence Pro | v2.0</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07090f;
+    --surface: #0e1117;
+    --surface2: #141720;
+    --surface3: #1a1e2a;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --accent: #4f8ef7;
+    --accent2: #7b5ea7;
+    --green: #22d3a5;
+    --red: #f4506b;
+    --orange: #f9a03f;
+    --yellow: #fcd34d;
+    --text: #e8eaf0;
+    --text2: #8b91a8;
+    --text3: #555c72;
+    --sidebar-w: 240px;
+    --topbar-h: 64px;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    font-size: 14px;
+  }
+
+  h1,h2,h3,h4,h5 { font-family: 'Syne', sans-serif; }
+
+  /* LAYOUT */
+  .layout { display: flex; height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 50;
+  }
+
+  .sidebar-logo {
+    padding: 20px 20px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo .brand-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #4f8ef7, #7b5ea7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .sidebar-logo .version { font-size: 10px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
+
+  .brand-switcher {
+    padding: 10px 14px;
+    margin: 10px 14px 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand-switcher .bname { font-size: 12px; font-weight: 600; color: var(--text); }
+  .brand-switcher .btype { font-size: 10px; color: var(--text2); }
+  .brand-switcher i { color: var(--text3); font-size: 10px; }
+
+  .sidebar-nav { flex: 1; overflow-y: auto; padding: 6px 10px; }
+  .nav-section-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 10px 10px 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    margin-bottom: 2px;
+    text-align: left;
+    width: 100%;
+    background: none;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active {
+    background: rgba(79,142,247,0.12);
+    color: var(--accent);
+    border-color: rgba(79,142,247,0.2);
+  }
+  .nav-item i { width: 16px; text-align: center; font-size: 12px; }
+  .nav-item .badge {
+    margin-left: auto;
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 20px;
+    font-weight: 700;
+  }
+  .badge-new { background: rgba(79,142,247,0.2); color: var(--accent); }
+  .badge-alert { background: rgba(244,80,107,0.2); color: var(--red); }
+
+  .sidebar-footer {
+    padding: 12px 14px;
+    border-top: 1px solid var(--border);
+  }
+  .health-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .health-bar .label { font-size: 10px; color: var(--text3); width: 70px; }
+  .health-track { flex: 1; height: 4px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
+  .health-fill { height: 100%; border-radius: 2px; }
+
+  /* MAIN AREA */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* TOPBAR */
+  .topbar {
+    height: var(--topbar-h);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .topbar .page-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; flex: 1; }
+  .topbar-filters { display: flex; gap: 8px; align-items: center; }
+  
+  select, input[type="date"], input[type="text"], input[type="number"], textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  select:hover, input:hover { border-color: rgba(79,142,247,0.4); }
+  select:focus, input:focus { border-color: var(--accent); }
+
+  .btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #6ca0f8; }
+  .btn-ghost { background: var(--surface2); border: 1px solid var(--border2); color: var(--text2); }
+  .btn-ghost:hover { color: var(--text); border-color: var(--border2); }
+  .btn-success { background: rgba(34,211,165,0.15); border: 1px solid rgba(34,211,165,0.3); color: var(--green); }
+  .btn-danger { background: rgba(244,80,107,0.15); border: 1px solid rgba(244,80,107,0.3); color: var(--red); }
+  .btn-sm { padding: 4px 10px; font-size: 11px; }
+
+  /* CONTENT */
+  .content { flex: 1; overflow-y: auto; padding: 24px; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .card-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .card-sub { font-size: 11px; color: var(--text3); margin-bottom: 16px; }
+
+  /* GRIDS */
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+  .grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 14px; }
+
+  /* KPI CARDS */
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .kpi.blue::before { background: linear-gradient(90deg, var(--accent), transparent); }
+  .kpi.green::before { background: linear-gradient(90deg, var(--green), transparent); }
+  .kpi.red::before { background: linear-gradient(90deg, var(--red), transparent); }
+  .kpi.orange::before { background: linear-gradient(90deg, var(--orange), transparent); }
+  .kpi.purple::before { background: linear-gradient(90deg, var(--accent2), transparent); }
+
+  .kpi .kpi-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text3); }
+  .kpi .kpi-value { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; margin: 6px 0 4px; }
+  .kpi .kpi-delta { font-size: 11px; }
+  .kpi .kpi-delta.pos { color: var(--green); }
+  .kpi .kpi-delta.neg { color: var(--red); }
+  .kpi .kpi-delta.neutral { color: var(--text3); }
+  .kpi .kpi-icon { position: absolute; right: 16px; top: 16px; font-size: 22px; opacity: 0.12; }
+  .kpi-editable { cursor: pointer; }
+  .kpi-editable:hover { border-color: var(--border2); }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { border-bottom: 1px solid var(--border); }
+  thead th {
+    padding: 10px 14px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text3);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  thead th:hover { color: var(--text2); }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td { padding: 11px 14px; font-size: 12.5px; vertical-align: middle; }
+  tbody tr:last-child { border-bottom: none; }
+
+  /* TAGS */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .tag-blue { background: rgba(79,142,247,0.15); color: var(--accent); }
+  .tag-green { background: rgba(34,211,165,0.15); color: var(--green); }
+  .tag-red { background: rgba(244,80,107,0.15); color: var(--red); }
+  .tag-orange { background: rgba(249,160,63,0.15); color: var(--orange); }
+  .tag-purple { background: rgba(123,94,167,0.15); color: var(--accent2); }
+  .tag-yellow { background: rgba(252,211,77,0.12); color: var(--yellow); }
+  .tag-gray { background: rgba(139,145,168,0.15); color: var(--text2); }
+
+  /* INTENT COLORS */
+  .intent-awareness { background: rgba(79,142,247,0.15); color: #7bb3ff; }
+  .intent-education { background: rgba(123,94,167,0.15); color: #b08fe8; }
+  .intent-consideration { background: rgba(34,211,165,0.15); color: var(--green); }
+  .intent-conversion { background: rgba(244,80,107,0.15); color: var(--red); }
+  .intent-retention { background: rgba(249,160,63,0.15); color: var(--orange); }
+  .intent-winback { background: rgba(252,211,77,0.12); color: var(--yellow); }
+
+  /* SECTION HEADERS */
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .section-header h2 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; }
+  .section-header p { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+  .mb-4 { margin-bottom: 14px; }
+  .mb-6 { margin-bottom: 20px; }
+  .mb-8 { margin-bottom: 28px; }
+  .mt-4 { margin-top: 14px; }
+  .mt-6 { margin-top: 20px; }
+  .flex { display: flex; }
+  .flex-col { flex-direction: column; }
+  .items-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+  .gap-2 { gap: 8px; }
+  .gap-3 { gap: 12px; }
+  .gap-4 { gap: 16px; }
+
+  /* PROGRESS BAR */
+  .progress-row { margin-bottom: 10px; }
+  .progress-label { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12px; color: var(--text2); }
+  .progress-track { height: 6px; background: var(--surface3); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+  /* LIFECYCLE BAR */
+  .lifecycle-bar {
+    display: flex;
+    height: 52px;
+    border-radius: 10px;
+    overflow: hidden;
+    gap: 2px;
+  }
+  .lifecycle-seg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    flex-direction: column;
+    gap: 2px;
+    transition: flex 0.5s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .lifecycle-seg span { font-size: 14px; font-weight: 800; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 16px;
+    padding: 28px;
+    width: 640px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .modal-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; }
+  .modal-close { background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; padding: 4px; }
+  .modal-close:hover { color: var(--text); }
+
+  /* FORM */
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); margin-bottom: 6px; display: block; }
+  .form-control {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-control:focus { border-color: var(--accent); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  /* CHART CONTAINER */
+  .chart-box { position: relative; }
+  .chart-box canvas { max-height: 220px; }
+
+  /* NOTIFICATION TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--green);
+    color: var(--green);
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 9999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* SCORE RING */
+  .score-ring {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .ring-value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; }
+  .ring-label { font-size: 10px; color: var(--text3); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* FLOW CARD */
+  .flow-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .flow-card:hover { border-color: var(--border2); background: var(--surface3); }
+  .flow-name { font-weight: 600; font-size: 13px; }
+  .flow-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .flow-stats { text-align: right; }
+  .flow-revenue { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--green); }
+  .flow-rate { font-size: 11px; color: var(--text3); }
+
+  /* COHORT TABLE */
+  .cohort-cell {
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* UPLOAD ZONE */
+  .upload-zone {
+    border: 2px dashed var(--border2);
+    border-radius: 12px;
+    padding: 48px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .upload-zone:hover { border-color: var(--accent); background: rgba(79,142,247,0.04); }
+  .upload-zone i { font-size: 36px; color: var(--text3); margin-bottom: 12px; display: block; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+
+  /* TOOLTIP */
+  [data-tooltip] { position: relative; cursor: help; }
+  [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1e2a;
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 100;
+  }
+  [data-tooltip]:hover::after { opacity: 1; }
+
+  /* SWITCH */
+  .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--surface3); border-radius: 18px; transition: 0.2s;
+  }
+  .slider:before {
+    position: absolute; content: ""; height: 12px; width: 12px;
+    left: 3px; bottom: 3px; background: var(--text3);
+    border-radius: 50%; transition: 0.2s;
+  }
+  input:checked + .slider { background: var(--accent); }
+  input:checked + .slider:before { transform: translateX(16px); background: white; }
+
+  /* INPUT FIELD EDITABLE */
+  .editable-input {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font: inherit;
+    width: 100%;
+    outline: none;
+    cursor: pointer;
+  }
+  .editable-input:focus { 
+    background: var(--surface3); 
+    border-radius: 4px; 
+    padding: 2px 4px;
+    cursor: text;
+  }
+
+  /* ALERT STRIP */
+  .alert-strip {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .alert-strip.warning { background: rgba(249,160,63,0.12); border: 1px solid rgba(249,160,63,0.2); color: var(--orange); }
+  .alert-strip.danger { background: rgba(244,80,107,0.12); border: 1px solid rgba(244,80,107,0.2); color: var(--red); }
+  .alert-strip.success { background: rgba(34,211,165,0.12); border: 1px solid rgba(34,211,165,0.2); color: var(--green); }
+  .alert-strip.info { background: rgba(79,142,247,0.12); border: 1px solid rgba(79,142,247,0.2); color: var(--accent); }
+
+  /* FILTER ROW */
+  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+  .filter-pill {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    background: var(--surface2);
+    transition: all 0.15s;
+  }
+  .filter-pill:hover { border-color: var(--border2); color: var(--text); }
+  .filter-pill.active { background: rgba(79,142,247,0.15); border-color: rgba(79,142,247,0.3); color: var(--accent); }
+
+  /* CHANNEL ICON */
+  .ch-email { color: #4f8ef7; }
+  .ch-sms { color: #22d3a5; }
+  .ch-wa { color: #25d366; }
+  .ch-push { color: #f9a03f; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text3);
+  }
+  .empty-state i { font-size: 32px; margin-bottom: 12px; display: block; opacity: 0.4; }
+  .empty-state p { font-size: 13px; }
+
+  /* METRIC COMPARISON */
+  .compare-bar {
+    display: flex;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 6px;
+    background: var(--surface3);
+  }
+  .compare-fill { border-radius: 4px; transition: width 0.6s ease; }
+
+  /* DROPDOWN MENU */
+  .dropdown { position: relative; display: inline-block; }
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    min-width: 180px;
+    z-index: 100;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  }
+  .dropdown-menu.open { display: block; }
+  .dropdown-item {
+    padding: 10px 16px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.1s;
+  }
+  .dropdown-item:hover { background: var(--surface2); color: var(--text); }
+
+  /* ABtest card */
+  .ab-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+  .ab-row { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 12px; align-items: center; }
+  .ab-variant { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .ab-bar { height: 24px; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-size: 11px; font-weight: 600; color: white; }
+
+  /* INSIGHTS CHIP */
+  .insight-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .insight-icon { font-size: 18px; margin-top: 1px; flex-shrink: 0; }
+  .insight-text { font-size: 12.5px; line-height: 1.6; color: var(--text2); }
+  .insight-text strong { color: var(--text); font-weight: 600; }
+
+  /* HEADER ACCENT LINE */
+  .page-accent { 
+    width: 36px; height: 3px; 
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px; margin-bottom: 16px;
+  }
+
+  /* ANIMATED DOT */
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+  .dot-live { 
+    width: 6px; height: 6px; border-radius: 50%; 
+    background: var(--green);
+    display: inline-block;
+    animation: pulse 2s infinite;
+    margin-right: 5px;
+  }
+
+  /* CHANNEL SPLIT VISUAL */
+  .channel-split { display: flex; height: 28px; border-radius: 6px; overflow: hidden; gap: 2px; }
+  .cs-seg { display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.9); transition: flex 0.4s; }
+
+  /* SCORE PILL */
+  .score-pill {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+  }
+  .score-high { background: rgba(34,211,165,0.15); color: var(--green); }
+  .score-mid { background: rgba(249,160,63,0.15); color: var(--orange); }
+  .score-low { background: rgba(244,80,107,0.15); color: var(--red); }
+
+  /* ROW ACTIONS */
+  .row-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
+  tr:hover .row-actions { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="brand-name">BRAND INTELLIGENCE</div>
+      <div class="version">PRO SUITE v2.0</div>
+    </div>
+
+    <div class="brand-switcher" onclick="openModal('brandModal')">
+      <div>
+        <div class="bname" id="activeBrandName">Luxe Fashion Co.</div>
+        <div class="btype" id="activeBrandType">DTC · Fashion · Medium AOV</div>
+      </div>
+      <i class="fas fa-chevron-down"></i>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Core Analytics</div>
+      <button class="nav-item active" onclick="showPage('overview',this)">
+        <i class="fas fa-chart-line"></i> Overview
+      </button>
+      <button class="nav-item" onclick="showPage('campaigns',this)">
+        <i class="fas fa-bullhorn"></i> Campaign Deep Dive
+        <span class="badge badge-alert">3 alerts</span>
+      </button>
+      <button class="nav-item" onclick="showPage('flows',this)">
+        <i class="fas fa-code-branch"></i> Journey & Flows
+      </button>
+      <button class="nav-item" onclick="showPage('retention',this)">
+        <i class="fas fa-redo"></i> Retention & Cohorts
+      </button>
+      <button class="nav-item" onclick="showPage('frequency',this)">
+        <i class="fas fa-bell"></i> Frequency & Fatigue
+      </button>
+
+      <div class="nav-section-label" style="margin-top:10px">Intelligence</div>
+      <button class="nav-item" onclick="showPage('intent',this)">
+        <i class="fas fa-crosshairs"></i> Intent Analysis
+        <span class="badge badge-new">NEW</span>
+      </button>
+      <button class="nav-item" onclick="showPage('postclick',this)">
+        <i class="fas fa-mouse-pointer"></i> Post-Click Signals
+        <span class="badge badge-new">NEW</span>
+      </button>
+      <button class="nav-item" onclick="showPage('abtests',this)">
+        <i class="fas fa-flask"></i> A/B Test History
+      </button>
+      <button class="nav-item" onclick="showPage('creative',this)">
+        <i class="fas fa-paint-brush"></i> Creative Library
+      </button>
+
+      <div class="nav-section-label" style="margin-top:10px">Setup</div>
+      <button class="nav-item" onclick="showPage('brandsetup',this)">
+        <i class="fas fa-building"></i> Brand Profile
+      </button>
+      <button class="nav-item" onclick="showPage('datainput',this)">
+        <i class="fas fa-upload"></i> Data Upload
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="health-bar">
+        <div class="label" style="font-size:9px;text-transform:uppercase;letter-spacing:0.8px;">CRM Health</div>
+        <div class="health-track"><div class="health-fill" style="width:72%;background:var(--green);"></div></div>
+        <div style="font-size:10px;color:var(--green);font-weight:700;">72%</div>
+      </div>
+      <div class="health-bar">
+        <div class="label" style="font-size:9px;text-transform:uppercase;letter-spacing:0.8px;">Deliverability</div>
+        <div class="health-track"><div class="health-fill" style="width:89%;background:var(--accent);"></div></div>
+        <div style="font-size:10px;color:var(--accent);font-weight:700;">89%</div>
+      </div>
+      <div class="health-bar">
+        <div class="label" style="font-size:9px;text-transform:uppercase;letter-spacing:0.8px;">Fatigue Risk</div>
+        <div class="health-track"><div class="health-fill" style="width:58%;background:var(--orange);"></div></div>
+        <div style="font-size:10px;color:var(--orange);font-weight:700;">MED</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="page-title" id="pageTitle">Overview</div>
+      <div class="topbar-filters">
+        <span class="dot-live"></span>
+        <select id="dateRangeFilter" onchange="refreshAllCharts()">
+          <option value="30">Last 30 Days</option>
+          <option value="60">Last 60 Days</option>
+          <option value="90">Last 90 Days</option>
+          <option value="custom">Custom Range</option>
+        </select>
+        <input type="date" id="dateFrom" style="display:none">
+        <input type="date" id="dateTo" style="display:none">
+        <select id="channelFilter" onchange="refreshAllCharts()">
+          <option value="all">All Channels</option>
+          <option value="email">Email</option>
+          <option value="sms">SMS</option>
+          <option value="wa">WhatsApp</option>
+          <option value="push">Push</option>
+        </select>
+        <select id="compareFilter">
+          <option>vs Previous Period</option>
+          <option>vs Industry Avg</option>
+          <option>vs Target</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost btn-sm" onclick="exportReport()"><i class="fas fa-download"></i> Export</button>
+        <button class="btn btn-primary btn-sm" onclick="showToast('Dashboard refreshed with latest data.','success')"><i class="fas fa-sync-alt"></i> Refresh</button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ====== PAGE: OVERVIEW ====== -->
+      <div id="page-overview" class="page active">
+        <div class="page-accent"></div>
+        
+        <div class="alert-strip warning mb-4">
+          <i class="fas fa-exclamation-triangle"></i>
+          <strong>Frequency Alert:</strong> Email avg 4.1/week — approaching fatigue threshold. Consider suppressing low-engagers.
+          <button class="btn btn-sm btn-ghost" style="margin-left:auto">View Fatigue Report →</button>
+        </div>
+
+        <!-- KPIs -->
+        <div class="grid-4 mb-6">
+          <div class="kpi blue kpi-editable" onclick="openKpiModal('aov')">
+            <i class="fas fa-shopping-cart kpi-icon"></i>
+            <div class="kpi-label">Avg Order Value</div>
+            <div class="kpi-value" id="kpi-aov">$112.50</div>
+            <div class="kpi-delta pos">↑ +$8.20 vs last month</div>
+          </div>
+          <div class="kpi green kpi-editable" onclick="openKpiModal('crm')">
+            <i class="fas fa-percentage kpi-icon"></i>
+            <div class="kpi-label">CRM Revenue %</div>
+            <div class="kpi-value" id="kpi-crm">38.4%</div>
+            <div class="kpi-delta neutral">Target: 40% · Gap: 1.6pts</div>
+          </div>
+          <div class="kpi orange kpi-editable" onclick="openKpiModal('cycle')">
+            <i class="fas fa-clock kpi-icon"></i>
+            <div class="kpi-label">Purchase Cycle</div>
+            <div class="kpi-value" id="kpi-cycle">24 Days</div>
+            <div class="kpi-delta pos">↓ -2 days vs last month</div>
+          </div>
+          <div class="kpi purple kpi-editable" onclick="openKpiModal('disc')">
+            <i class="fas fa-tag kpi-icon"></i>
+            <div class="kpi-label">Discount Sensitivity</div>
+            <div class="kpi-value" style="font-size:20px;padding-top:4px;" id="kpi-disc">MEDIUM</div>
+            <div class="kpi-delta neutral">42% of revenue driven by discounts</div>
+          </div>
+        </div>
+
+        <!-- Second row KPIs -->
+        <div class="grid-4 mb-6">
+          <div class="kpi blue">
+            <i class="fas fa-paper-plane kpi-icon"></i>
+            <div class="kpi-label">Avg Open Rate</div>
+            <div class="kpi-value">24.3%</div>
+            <div class="kpi-delta pos">↑ +2.1% WoW</div>
+          </div>
+          <div class="kpi green">
+            <i class="fas fa-mouse-pointer kpi-icon"></i>
+            <div class="kpi-label">Avg CTR</div>
+            <div class="kpi-value">3.8%</div>
+            <div class="kpi-delta neutral">Industry: 2.9%</div>
+          </div>
+          <div class="kpi red">
+            <i class="fas fa-user-minus kpi-icon"></i>
+            <div class="kpi-label">Unsub Rate (30d)</div>
+            <div class="kpi-value">0.32%</div>
+            <div class="kpi-delta neg">↑ +0.08% · Watch closely</div>
+          </div>
+          <div class="kpi orange">
+            <i class="fas fa-redo kpi-icon"></i>
+            <div class="kpi-label">Repeat Purchase %</div>
+            <div class="kpi-value">32.1%</div>
+            <div class="kpi-delta pos">↑ +3.2% vs Q2</div>
+          </div>
+        </div>
+
+        <!-- Charts Row 1 -->
+        <div class="grid-2 mb-6">
+          <div class="card">
+            <div class="section-header">
+              <div><div class="card-title">Revenue by Channel</div><div class="card-sub">CRM revenue split across channels this period</div></div>
+              <select class="form-control" style="width:110px;font-size:11px" onchange="updateRevChart(this.value)">
+                <option value="revenue">Revenue</option>
+                <option value="orders">Orders</option>
+                <option value="customers">Customers</option>
+              </select>
+            </div>
+            <div class="chart-box"><canvas id="revChannelChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="section-header">
+              <div><div class="card-title">Campaign Intent Mix</div><div class="card-sub">Distribution of campaign goals this period</div></div>
+            </div>
+            <div class="chart-box"><canvas id="intentChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div class="grid-2 mb-6">
+          <div class="card">
+            <div class="card-title mb-4">Revenue Trend (Weekly)</div>
+            <div class="chart-box"><canvas id="trendChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="section-header">
+              <div><div class="card-title">Business Model Profile</div><div class="card-sub">Key brand DNA signals</div></div>
+              <button class="btn btn-ghost btn-sm" onclick="showPage('brandsetup', document.querySelector('[onclick*=\"brandsetup\"]'))">Edit Profile</button>
+            </div>
+            <div class="progress-row">
+              <div class="progress-label"><span>Email</span><span id="pct-email">55%</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:55%;background:var(--accent);" id="bar-email"></div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-label"><span>WhatsApp</span><span id="pct-wa">30%</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:30%;background:var(--green);" id="bar-wa"></div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-label"><span>SMS</span><span id="pct-sms">15%</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:15%;background:var(--orange);" id="bar-sms"></div></div>
+            </div>
+            <hr style="border-color:var(--border);margin:16px 0;">
+            <div class="grid-3" style="text-align:center;">
+              <div>
+                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;">Model</div>
+                <div style="font-size:14px;font-weight:700;color:var(--accent);margin-top:4px;" id="overview-model">DTC Fashion</div>
+              </div>
+              <div>
+                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;">Top Category</div>
+                <div style="font-size:14px;font-weight:700;margin-top:4px;" id="overview-topcat">Dresses</div>
+              </div>
+              <div>
+                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;">AOV Band</div>
+                <div style="font-size:14px;font-weight:700;color:var(--green);margin-top:4px;">$75–$150</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Insights -->
+        <div class="card">
+          <div class="section-header">
+            <div><div class="card-title">🤖 AI-Generated Insights</div><div class="card-sub">Automated analysis of your CRM performance</div></div>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Insights refreshed','success')"><i class="fas fa-bolt"></i> Refresh Insights</button>
+          </div>
+          <div class="grid-3">
+            <div class="insight-chip">
+              <div class="insight-icon" style="color:var(--red);">⚠️</div>
+              <div class="insight-text"><strong>Unsub spike detected</strong> on 25% discount campaigns. Churn-risk segment showing 0.8% unsub rate — 2.5x brand average. Consider value-led messaging instead of blanket discounts.</div>
+            </div>
+            <div class="insight-chip">
+              <div class="insight-icon" style="color:var(--green);">✅</div>
+              <div class="insight-text"><strong>Win-back flow outperforming</strong> — 180-day lapsed segment CTR at 4.2% vs 2.1% campaign average. Increase cadence from 3 to 5 emails over 30 days.</div>
+            </div>
+            <div class="insight-chip">
+              <div class="insight-icon" style="color:var(--orange);">💡</div>
+              <div class="insight-text"><strong>WhatsApp shows highest ATC rate</strong> at 21% vs Email 14%. Opportunity to shift more conversion campaigns to WA channel for top products.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ====== PAGE: CAMPAIGNS ====== -->
+      <div id="page-campaigns" class="page">
+        <div class="page-accent"></div>
+        <div class="section-header mb-6">
+          <div>
+            <h2>Campaign Deep Dive</h2>
+            <p>Full performance breakdown with intent, post-click, and revenue attribution</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('addCampaignModal')"><i class="fas fa-plus"></i> Add Campaign</button>
+        </div>
+
+        <div class="alert-strip danger mb-4">
+          <i class="fas fa-fire"></i>
+          <strong>3 campaigns</strong> flagged for high unsubscribe rate (&gt;0.5%). Review urgently.
+          <button class="btn btn-sm btn-danger" style="margin-left:auto">View Flagged →</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-row">
+          <span style="font-size:11px;color:var(--text3);font-weight:700;">INTENT:</span>
+          <span class="filter-pill active" onclick="filterTable(this,'all')">All</span>
+          <span class="filter-pill" onclick="filterTable(this,'awareness')">Awareness</span>
+          <span class="filter-pill" onclick="filterTable(this,'education')">Education</span>
+          <span class="filter-pill" onclick="filterTable(this,'consideration')">Consideration</span>
+          <span class="filter-pill" onclick="filterTable(this,'conversion')">Conversion</span>
+          <span class="filter-pill" onclick="filterTable(this,'retention')">Retention</span>
+          <span class="filter-pill" onclick="filterTable(this,'winback')">Winback</span>
+          <div style="margin-left:auto;display:flex;gap:8px;">
+            <input type="text" placeholder="Search campaigns..." style="width:180px;" onkeyup="searchTable(this.value)">
+            <select onchange="sortTable(this.value)">
+              <option value="">Sort by...</option>
+              <option value="revenue">Revenue ↓</option>
+              <option value="ctr">CTR ↓</option>
+              <option value="openrate">Open Rate ↓</option>
+              <option value="unsub">Unsub Rate ↓</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card" style="padding:0;">
+          <div class="table-wrap">
+            <table id="campaignTable">
+              <thead>
+                <tr>
+                  <th onclick="sortCol(0)">Date / Campaign ↕</th>
+                  <th onclick="sortCol(1)">Segment Used</th>
+                  <th onclick="sortCol(2)">Seg. Excluded</th>
+                  <th onclick="sortCol(3)">Channel</th>
+                  <th onclick="sortCol(4)">Intent</th>
+                  <th onclick="sortCol(5)">Offer Type</th>
+                  <th onclick="sortCol(6)">Lifecycle Stage</th>
+                  <th onclick="sortCol(7)">Sent / Deliv.</th>
+                  <th onclick="sortCol(8)">Open Rate</th>
+                  <th onclick="sortCol(9)">CTR</th>
+                  <th onclick="sortCol(10)">ATC Rate</th>
+                  <th onclick="sortCol(11)">Revenue</th>
+                  <th onclick="sortCol(12)">Unsub / Opt-Out</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="campaignTbody">
+                <!-- Rows injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Campaign Charts -->
+        <div class="grid-2 mt-6">
+          <div class="card">
+            <div class="card-title mb-4">Revenue by Intent Type</div>
+            <div class="chart-box"><canvas id="intentRevChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title mb-4">CTR by Channel</div>
+            <div class="chart-box"><canvas id="ctrChannelChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ====== PAGE: FLOWS ====== -->
+      <div id="page-flows" class="page">
+        <div class="page-accent"></div>
+        <div class="section-header mb-6">
+          <div><h2>Journey & Flows Analytics</h2><p>Automated flow performance — revenue, conversion rates, and health signals</p></div>
+          <button class="btn btn-primary" onclick="openModal('addFlowModal')"><i class="fas fa-plus"></i> Add Flow</button>
+        </div>
+
+        <div class="grid-2-1">
+          <div>
+            <div class="flow-card" onclick="openFlowDetail('cart')">
+              <div>
+                <div class="flow-name">🛒 Abandoned Cart Recovery</div>
+                <div class="flow-meta">3 emails · 2 SMS · Trigger: Cart abandoned 1hr</div>
+                <div style="margin-top:8px;display:flex;gap:6px;">
+                  <span class="tag tag-green">Active</span>
+                  <span class="tag tag-blue">Conversion</span>
+                  <span class="tag tag-orange">High Priority</span>
+                </div>
+              </div>
+              <div class="flow-stats">
+                <div class="flow-revenue">$24,800</div>
+                <div class="flow-rate">Conv: 8.4% · Open: 38%</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:4px;">ATC: 22% · CTR: 11.2%</div>
+              </div>
+            </div>
+
+            <div class="flow-card" onclick="openFlowDetail('browse')">
+              <div>
+                <div class="flow-name">👁️ Browse Abandonment</div>
+                <div class="flow-meta">2 emails · Trigger: Viewed 3+ products, no cart</div>
+                <div style="margin-top:8px;display:flex;gap:6px;">
+                  <span class="tag tag-green">Active</span>
+                  <span class="tag tag-purple">Consideration</span>
+                </div>
+              </div>
+              <div class="flow-stats">
+                <div class="flow-revenue">$11,400</div>
+                <div class="flow-rate">Conv: 4.1% · Open: 28%</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:4px;">ATC: 14% · CTR: 6.8%</div>
+              </div>
+            </div>
+
+            <div class="flow-card" onclick="openFlowDetail('welcome')">
+              <div>
+                <div class="flow-name">👋 Welcome Series</div>
+                <div class="flow-meta">5 emails · 2 WA · Trigger: New subscriber</div>
+                <div style="margin-top:8px;display:flex;gap:6px;">
+                  <span class="tag tag-green">Active</span>
+                  <span class="tag tag-blue">Awareness + Education</span>
+                </div>
+              </div>
+              <div class="flow-stats">
+                <div class="flow-revenue">$18,200</div>
+                <div class="flow-rate">Conv: 12.3% · Open: 52%</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:4px;">ATC: 31% · CTR: 14.1%</div>
+              </div>
+            </div>
+
+            <div class="flow-card" onclick="openFlowDetail('winback')">
+              <div>
+                <div class="flow-name">🔁 Win-Back (180d Lapsed)</div>
+                <div class="flow-meta">4 emails · Trigger: No purchase in 180 days</div>
+                <div style="margin-top:8px;display:flex;gap:6px;">
+                  <span class="tag tag-orange">Under Review</span>
+                  <span class="tag tag-yellow">Winback</span>
+                </div>
+              </div>
+              <div class="flow-stats">
+                <div class="flow-revenue">$6,100</div>
+                <div class="flow-rate">Conv: 3.8% · Open: 21%</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:4px;">ATC: 9% · CTR: 4.2%</div>
+              </div>
+            </div>
+
+            <div class="flow-card" onclick="openModal('addFlowModal')">
+              <div style="display:flex;align-items:center;gap:10px;color:var(--text3);">
+                <i class="fas fa-plus-circle"></i>
+                <div>
+                  <div class="flow-name" style="color:var(--text2)">Add New Flow</div>
+                  <div class="flow-meta">Post-purchase, replenishment, loyalty, etc.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card mb-4">
+              <div class="card-title mb-4">Flow Revenue Share</div>
+              <div class="chart-box"><canvas id="flowShareChart"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="card-title mb-4">Flow Health Scores</div>
+              <div class="progress-row">
+                <div class="progress-label"><span>Abandoned Cart</span><span style="color:var(--green);">92/100</span></div>
+                <div class="progress-track"><div class="progress-fill" style="width:92%;background:var(--green);"></div></div>
+              </div>
+              <div class="progress-row">
+                <div class="progress-label"><span>Welcome Series</span><span style="color:var(--green);">88/100</span></div>
+                <div class="progress-track"><div class="progress-fill" style="width:88%;background:var(--green);"></div></div>
+              </div>
+              <div class="progress-row">
+                <div class="progress-label"><span>Browse Abandonment</span><span style="color:var(--accent);">74/100</span></div>
+                <div class="progress-track"><div class="progress-fill" style="width:74%;background:var(--accent);"></div></div>
+              </div>
+              <div class="progress-row">
+                <div class="progress-label"><span>Win-Back</span><span style="color:var(--orange);">58/100</span></div>
+                <div class="progress-track"><div class="progress-fill" style="width:58%;background:var(--orange);"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ====== PAGE: RETENTION ====== -->
+      <div id="page-retention" class="page">
+        <div class="page-accent"></div>
+        <div class="section-header mb-6">
+          <div><h2>Retention & Cohort Analysis</h2><p>Customer lifecycle, repeat purchase behavior, and cohort-level trends</p></div>
+          <div style="display:flex;gap:8px;">
+            <select class="form-control" style="width:130px">
+              <option>Monthly Cohorts</option>
+              <option>Weekly Cohorts</option>
+              <option>Acquisition Source</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-4 mb-6">
+          <div class="kpi blue">
+            <i class="fas fa-calendar-check kpi-icon"></i>
+            <div class="kpi-label">30-Day Retention</div>
+            <div class="kpi-value" id="r30">18.4%</div>
+            <div class="kpi-delta pos">↑ +1.2% vs last quarter</div>
+          </div>
+          <div class="kpi purple">
+            <i class="fas fa-calendar kpi-icon"></i>
+            <div class="kpi-label">60-Day Retention</div>
+            <div class="kpi-value" id="r60">12.1%</div>
+            <div class="kpi-delta neutral">Industry avg: 10.8%</div>
+          </div>
+          <div class="kpi green">
+            <i class="fas fa-calendar-alt kpi-icon"></i>
+            <div class="kpi-label">90-Day Retention</div>
+            <div class="kpi-value" id="r90">8.9%</div>
+            <div class="kpi-delta pos">↑ +0.7% QoQ</div>
+          </div>
+          <div class="kpi orange">
+            <i class="fas fa-redo kpi-icon"></i>
+            <div class="kpi-label">Repeat Purchase %</div>
+            <div class="kpi-value" id="rRepeat">32.1%</div>
+            <div class="kpi-delta pos">Model avg: 28% ↑</div>
+          </div>
+        </div>
+
+        <!-- Lifecycle Bar -->
+        <div class="card mb-6">
+          <div class="section-header">
+            <div><div class="card-title">Customer Lifecycle Distribution</div><div class="card-sub">Click a segment to filter cohort data below</div></div>
+            <button class="btn btn-ghost btn-sm" onclick="openModal('lifecycleEditModal')"><i class="fas fa-edit"></i> Edit %</button>
+          </div>
+          <div class="lifecycle-bar" id="lifecycleBar">
+            <div class="lifecycle-seg" style="flex:2;background:linear-gradient(135deg,#22d3a5,#0fa374);border-radius:10px 0 0 10px;" onclick="filterLifecycle('active')">
+              <span>40%</span><div style="font-size:9px;opacity:0.85;">ACTIVE</div>
+            </div>
+            <div class="lifecycle-seg" style="flex:1.25;background:linear-gradient(135deg,#fcd34d,#f59e0b);" onclick="filterLifecycle('atrisk')">
+              <span>25%</span><div style="font-size:9px;opacity:0.85;">AT RISK</div>
+            </div>
+            <div class="lifecycle-seg" style="flex:0.75;background:linear-gradient(135deg,#f9a03f,#d97706);" onclick="filterLifecycle('snoozed')">
+              <span>15%</span><div style="font-size:9px;opacity:0.85;">SNOOZED</div>
+            </div>
+            <div class="lifecycle-seg" style="flex:1;background:linear-gradient(135deg,#f4506b,#c2001e);border-radius:0 10px 10px 0;" onclick="filterLifecycle('lost')">
+              <span>20%</span><div style="font-size:9px;opacity:0.85;">LOST</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cohort Table -->
+        <div class="card mb-6">
+          <div class="card-title mb-4">Monthly Cohort Retention Table</div>
+          <div class="table-wrap">
+            <table id="cohortTable">
+              <thead>
+                <tr>
+                  <th>Cohort</th>
+                  <th>Size</th>
+                  <th>Month 1</th>
+                  <th>Month 2</th>
+                  <th>Month 3</th>
+                  <th>Month 4</th>
+                  <th>Month 5</th>
+                  <th>Month 6</th>
+                </tr>
+              </thead>
+              <tbody id="cohortTbody">
+                <!-- Injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title mb-4">Retention Curve (30/60/90)</div>
+            <div class="chart-box"><canvas id="retentionChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title mb-4">Repeat Purchase Frequency Distribution</div>
+            <div class="chart-box"><canvas id="freqDistChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ====== PAGE: FREQUENCY ====== -->
+      <div id="page-frequency" class="page">
+        <div class="page-accent"></div>
+        <div class="section-header mb-6">
+          <div><h2>Frequency & Fatigue Analysis</h2><p>Monitor send pressure, engagement decay, and optimal cadence by segment</p></div>
+        </div>
+
+        <div class="grid-3 mb-6">
+          <div class="kpi orange">
+            <i class="fas fa-bell kpi-icon"></i>
+            <div class="kpi-label">Avg Msgs / User / Week</div>
+            <div class="kpi-value">3.2</div>
+            <div class="kpi-delta neg">↑ +0.4 vs last month · Near limit</div>
+          </div>
+          <div class="kpi blue">
+            <i class="fas fa-envelope kpi-icon"></i>
+            <div class="kpi-label">Email / Week</div>
+            <div class="kpi-value">2.1</div>
+            <div class="kpi-delta neutral">Recommended: ≤ 2.5</div>
+          </div>
+          <div class="kpi green">
+            <i class="fab fa-whatsapp kpi-icon"></i>
+            <div class="kpi-label">WhatsApp / Week</div>
+            <div class="kpi-value">1.1</div>
+            <div class="kpi-delta neutral">Recommended: ≤ 1.5</div>
+          </div>
+        </div>
+
+        <div class="grid-2 mb-6">
+          <div class="card">
+            <div class="card-title mb-4">Engagement vs Frequency (Email)</div>
+            <div class="chart-box"><canvas id="freqEngageChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title mb-4">Send Timing Heatmap</div>
+            <div id="timingHeatmap" style="display:grid;grid-template-columns:repeat(8,1fr);gap:3px;"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-header">
+            <div><div class="card-title">Segment-Level Frequency Report</div><div class="card-sub">Avg messages per user per week by segment</div></div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('freqCapModal')"><i class="fas fa-sliders-h"></i> Set Frequency Caps</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Segment</th>
+                  <th>Size</th>
+                  <th>Email/Wk</th>
+                  <th>WA/Wk</th>
+                  <th>SMS/Wk</th>
+                  <th>Total/Wk</th>
+                  <th>Unsub Rate</th>
+                  <th>Fatigue Status</th>
+                  <th>Cap</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>VIP Buyers</strong></td>
+                  <td>2,840</td>
+                  <td>2.8</td>
+                  <td>1.2</td>
+                  <td>0.3</td>
+                  <td><strong>4.3</strong></td>
+                  <td style="color:var(--red)">0.52%</td>
+                  <td><span class="tag tag-red">⚠ HIGH</span></td>
+                  <td><select class="form-control" style="font-size:11px;padding:3px 6px;"><option>5/wk</option><option>4/wk</option><option selected>3/wk</option><option>2/wk</option></select></td>
+                </tr>
+                <tr>
+                  <td><strong>Active Buyers</strong></td>
+                  <td>8,210</td>
+                  <td>2.1</td>
+                  <td>1.0</td>
+                  <td>0.2</td>
+                  <td><strong>3.3</strong></td>
+                  <td style="color:var(--orange)">0.28%</td>
+                  <td><span class="tag tag-orange">MED</span></td>
+                  <td><select class="form-control" style="font-size:11px;padding:3px 6px;"><option>5/wk</option><option selected>4/wk</option><option>3/wk</option><option>2/wk</option></select></td>
+                </tr>
+                <tr>
+                  <td><strong>Browse-Only</strong></td>
+                  <td>14,500</td>
+                  <td>1.8</td>
+                  <td>0.4</td>
+                  <td>0.1</td>
+                  <td><strong>2.3</strong></td>
+                  <td style="color:var(--green)">0.18%</td>
+                  <td><span class="tag tag-green">LOW</span></td>
+                  <td><select class="form-control" style="font-size:11px;padding:3px 6px;"><option>5/wk</option><option selected>4/wk</option><option>3/wk</option></select></td>
+                </tr>
+                <tr>
+                  <td><strong>Lapsed (90d+)</strong></td>
+                  <td>6,100</td>
+                  <td>1.2</td>
+                  <td>0.2</td>
+                  <td>0.0</td>
+                  <td><strong>1.4</strong></td>
+                  <td style="color:var(--green)">0.09%</td>
+                  <td><span class="tag tag-green">SAFE</span></td>
+                  <td><select class="form-control" style="font-size:11px;padding:3px 6px;"><option>3/wk</option><option selected>2/wk</option><option>1/wk</option></select></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ====== PAGE: INTENT ANALYSIS ====== -->
+      <div id="page-intent" class="page">
+        <div class="page-accent"></div>
+        <div class="section-header mb-6">
+          <div><h2>Intent Classification & Analysis</h2><p>Campaign performance segmented by strategic intent</p></div>
+          <span class="tag tag-blue" style="font-size:12px;padding:5px 12px;">NEW MODULE</span>
+        </div>
+
+        <div class="grid-3 mb-6">
+          <div class="card" style="grid-column:span 1;">
+            <div class="card-title mb-4">Intent Mix Distribution</div>
+            <div class="chart-box"><canvas id="intentDonutChart" style="max-height:200px;"></canvas></div>
+          </div>
+          <div class="card" style="grid-column:span 2;">
+            <div class="card-title mb-4">Revenue & CTR by Intent Category</div>
+            <div class="chart-box"><canvas id="intentPerformChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="card mb-6">
+          <div class="card-title mb-4">Intent Performance Benchmarks</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Intent Type</th>
+                  <th># Campaigns</th>
+                  <th>Avg Open Rate</th>
+                  <th>Avg CTR</th>
+                  <th>Avg ATC Rate</th>
+                  <th>Total Revenue</th>
+                  <th>Avg Unsub Rate</th>
+                  <th>Top Channel</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="tag intent-awareness">Awareness</span></td>
+                  <td>6</td>
+                  <td>32.1%</td>
+                  <td>1.4%</td>
+                  <td>6.2%</td>
+                  <td>$8,400</td>
+                  <td style="color:var(--green)">0.08%</td>
+                  <td><i class="fas fa-envelope ch-email"></i> Email</td>
+                </tr>
+                <tr>
+                  <td><span class="tag intent-education">Education</span></td>
+                  <td>4</td>
+                  <td>28.4%</td>
+                  <td>2.1%</td>
+                  <td>8.8%</td>
+                  <td>$5,200</td>
+                  <td style="color:var(--green)">0.10%</td>
+                  <td><i class="fab fa-whatsapp ch-wa"></i> WhatsApp</td>
+                </tr>
+                <tr>
+                  <td><span class="tag intent-consideration">Consideration</span></td>
+                  <td>5</td>
+                  <td>24.8%</td>
+                  <td>3.8%</td>
+                  <td>14.2%</td>
+                  <td>$14,800</td>
+                  <td style="color:var(--green)">0.14%</td>
+                  <td><i class="fas fa-envelope ch-email"></i> Email</td>
+                </tr>
+                <tr>
+                  <td><span class="tag intent-conversion">Conversion</span></td>
+                  <td>12</td>
+                  <td>21.2%</td>
+                  <td>4.8%</td>
+                  <td>19.1%</td>
+                  <td>$48,200</td>
+                  <td style="color:var(--red)">0.42%</td>
+                  <td><i class="fab fa-whatsapp ch-wa"></i> WhatsApp</td>
+                </tr>
+                <tr>
+                  <td><span class="tag intent-retention">Retention</span></td>
+                  <td>7</td>
+                  <td>26.4%</td>
+                  <td>3.2%</td>
+                  <td>11.4%</td>
+                  <td>$18,600</td>
+                  <td style="color:var(--green)">0.16%</td>
+                  <td><i class="fas fa-envelope ch-email"></i> Email</td>
+                </tr>
+                <tr>
+                  <td><span class="tag intent-winback">Winback</span></td>
+                  <td>3</td>
+                  <td>18.8%</td>
+                  <td>2.8%</td>
+                  <td>9.2%</td>
+                  <td>$6,800</td>
+                  <td style="color:var(--orange)">0.28%</td>
+                  <td><i class="fas fa-envelope ch-email"></i> Email</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ====== PAGE: POST-CLICK ====== -->
+      <div id="page-postclick" class="page">
+        <div class="page-accent"></div>
+        <div class="section-header mb-6">
+          <div><h2>Post-Click & Landing Page Signals</h2><p>What happens after the click — session quality, bounce, ATC, and conversion</p></div>
+          <span class="tag tag-blue" style="font-size:12px;padding:5px 12px;">NEW MODULE</span>
+        </div>
+
+        <div class="grid-4 mb-6">
+          <div class="kpi green">
+            <i class="fas fa-mouse-pointer kpi-icon"></i>
+            <div class="kpi-label">Click → Session Rate</div>
+            <div class="kpi-value">68.4%</div>
+            <div class="kpi-delta neg">↓ -3.1% vs last period</div>
+          </div>
+          <div class="kpi red">
+            <i class="fas fa-door-open kpi-icon"></i>
+            <div class="kpi-label">Avg Bounce Rate</div>
+            <div class="kpi-value">41.2%</div>
+            <div class="kpi-delta neg">↑ +4.8% — Landing pages need review</div>
+          </div>
+          <div class="kpi orange">
+            <i class="fas fa-shopping-basket kpi-icon"></i>
+            <div class="kpi-label">ATC Rate (from CRM)</div>
+            <div class="kpi-value">16.8%</div>
+            <div class="kpi-delta pos">↑ +2.1% vs last period</div>
+          </div>
+          <div class="kpi blue">
+            <i class="fas fa-check-circle kpi-icon"></i>
+            <div class="kpi-label">Purchase Rate (post-click)</div>
+            <div class="kpi-value">4.2%</div>
+            <div class="kpi-delta neutral">Industry avg: 3.8%</div>
+          </div>
+        </div>
+
+        <div class="grid-2 mb-6">
+          <div class="card">
+            <div class="card-title mb-4">Funnel: Click → Purchase</div>
+            <div class="chart-box"><canvas id="funnelChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title mb-4">ATC Rate by Creative Hook Type</div>
+            <div class="progress-row">
+              <div class="progress-label"><span>Urgency/Scarcity</span><span style="color:var(--green)">22.4%</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:89%;background:var(--green);"></div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-label"><span>Social Proof / UGC</span><span style="color:var(--accent)">19.1%</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:76%;background:var(--accent);"></div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-label"><span>Product Feature</span><span style="color:var(--accent)">16.8%</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:67%;background:var(--accent);"></div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-label"><span>Discount / Offer</span><span style="color:var(--orange)">14.2%</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:57%;background:var(--orange);"></div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-label"><span>Storytelling / Brand</span><span style="color:var(--orange)">11.8%</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:47%;background:var(--orange);"></div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-label"><span>Educational</span><span style="color:var(--red)">8.4%</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:34%;background:var(--red);"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-header">
+            <div><div class="card-title">Post-Click Performance by Campaign</div><div class="card-sub">Click data mapped to landing page & session signals</div></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Campaign</th>
+                  <th>Creative Hook</th>
+                  <th>Offer Type</th>
+                  <th>Lifecycle Stage</th>
+                  <th>Click→Session</th>
+                  <th>Bounce Rate</th>
+                  <th>ATC Rate</th>
+                  <th>Purchase Rate</th>
+                  <th>Revenue/Click</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Flash Sale Oct 14</strong></td>
+                  <td><span class="tag tag-red">Urgency</span></td>
+                  <td>25% Off</td>
+                  <td><span class="tag tag-orange">Churn Risk</span></td>
+                  <td style="color:var(--green)">74%</td>
+                  <td style="color:var(--orange)">38%</td>
+                  <td style="color:var(--green)">21%</td>
+                  <td style="color:var(--green)">6.2%</td>
+                  <td style="color:var(--green);font-weight:700;">$4.80</td>
+                </tr>
+                <tr>
+                  <td><strong>New Arrivals Drop</strong></td>
+                  <td><span class="tag tag-blue">Product Feature</span></td>
+                  <td>No Offer</td>
+                  <td><span class="tag tag-green">Active</span></td>
+                  <td style="color:var(--green)">68%</td>
+                  <td style="color:var(--green)">32%</td>
+                  <td style="color:var(--accent)">18%</td>
+                  <td style="color:var(--accent)">4.8%</td>
+                  <td style="font-weight:700;">$3.20</td>
+                </tr>
+                <tr>
+                  <td><strong>Review Request Flow</strong></td>
+                  <td><span class="tag tag-purple">Social Proof</span></td>
+                  <td>Loyalty Points</td>
+                  <td><span class="tag tag-green">Active Buyer</span></td>
+                  <td style="color:var(--accent)">61%</td>
+                  <td style="color:var(--orange)">44%</td>
+                  <td style="color:var(--orange)">12%</td>
+                  <td style="color:var(--orange)">3.1%</td>
+                  <td style="font-weight:700;">$2.10</td>
+                </tr>
+                <tr>
+                  <td><strong>Win-Back Last Chance</strong></td>
+                  <td><span class="tag tag-red">Urgency</span></td>
+                  <td>20% + Free Ship</td>
+                  <td><span class="tag tag-red">Lapsed 180d</span></td>
+                  <td style="color:var(--orange)">52%</td>
+                  <td style="color:var(--red)">58%</td>
+                  <td style="color:var(--orange)">9%</td>
+                  <td style="color:var(--orange)">2.8%</td>
+                  <td style="font-weight:700;">$1.90</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ====== PAGE: A/B TESTS ====== -->
+      <div id="page-abtests" class="page">
+        <div class="page-accent"></div>
+        <div class="section-header mb-6">
+          <div><h2>A/B Test History & Results</h2><p>Complete record of split tests with statistical significance</p></div>
+          <button class="btn btn-primary" onclick="openModal('addABModal')"><i class="fas fa-flask"></i> Log New Test</button>
+        </div>
+
+        <div class="grid-3 mb-6">
+          <div class="kpi green">
+            <div class="kpi-label">Tests Run (All Time)</div>
+            <div class="kpi-value">24</div>
+          </div>
+          <div class="kpi blue">
+            <div class="kpi-label">Win Rate (A wins)</div>
+            <div class="kpi-value">54%</div>
+          </div>
+          <div class="kpi orange">
+            <div class="kpi-label">Avg Uplift (Winner)</div>
+            <div class="kpi-value">+18.4%</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title mb-4">A/B Test Log</div>
+          <div class="ab-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <div>
+                <div style="font-weight:700;font-size:14px;">Subject Line Test — Flash Sale</div>
+                <div style="font-size:11px;color:var(--text3);">Oct 2024 · Email · Conversion Intent · n=8,400</div>
+              </div>
+              <span class="tag tag-green">✓ Significant (p &lt; 0.05)</span>
+            </div>
+            <div class="ab-row mb-4">
+              <div class="ab-variant" style="color:var(--accent);">VARIANT A</div>
+              <div class="ab-bar" style="width:100%;background:rgba(79,142,247,0.2);">
+                <div class="ab-bar" style="width:42%;background:var(--accent);">OR: 24.2%</div>
+              </div>
+              <div style="text-align:right;font-size:12px;color:var(--text2);">"Last chance: 25% off ends tonight"</div>
+            </div>
+            <div class="ab-row">
+              <div class="ab-variant" style="color:var(--green);">VARIANT B 🏆</div>
+              <div class="ab-bar" style="width:100%;background:rgba(34,211,165,0.1);">
+                <div class="ab-bar" style="width:56%;background:var(--green);">OR: 31.8%</div>
+              </div>
+              <div style="text-align:right;font-size:12px;color:var(--text2);">"Your cart is about to disappear 👀"</div>
+            </div>
+            <div style="margin-top:10px;font-size:11px;color:var(--green);">Result: +31.4% open rate uplift. Apply winner subject line template going forward.</div>
+          </div>
+
+          <div class="ab-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <div>
+                <div style="font-weight:700;font-size:14px;">Send Time Test — Win-Back Flow</div>
+                <div style="font-size:11px;color:var(--text3);">Sep 2024 · Email · Winback Intent · n=5,200</div>
+              </div>
+              <span class="tag tag-orange">⏳ Borderline (p = 0.08)</span>
+            </div>
+            <div class="ab-row mb-4">
+              <div class="ab-variant" style="color:var(--accent);">VARIANT A</div>
+              <div class="ab-bar" style="width:100%;background:rgba(79,142,247,0.15);">
+                <div class="ab-bar" style="width:38%;background:var(--accent);">CTR: 2.4%</div>
+              </div>
+              <div style="text-align:right;font-size:12px;color:var(--text2);">Send: 10am Tuesday</div>
+            </div>
+            <div class="ab-row">
+              <div class="ab-variant" style="color:var(--orange);">VARIANT B</div>
+              <div class="ab-bar" style="width:100%;background:rgba(249,160,63,0.1);">
+                <div class="ab-bar" style="width:46%;background:var(--orange);">CTR: 2.9%</div>
+              </div>
+              <div style="text-align:right;font-size:12px;color:var(--text2);">Send: 7pm Thursday</div>
+            </div>
+            <div style="margin-top:10px;font-size:11px;color:var(--orange);">Not statistically significant. Run larger test (n=10,000+) to confirm.</div>
+          </div>
+
+          <button class="btn btn-ghost" style="width:100%;margin-top:8px;" onclick="openModal('addABModal')"><i class="fas fa-plus"></i> Log New A/B Test</button>
+        </div>
+      </div>
+
+
+      <!-- ====== PAGE: CREATIVE LIBRARY ====== -->
+      <div id="page-creative" class="page">
+        <div class="page-accent"></div>
+        <div class="section-header mb-6">
+          <div><h2>Creative Library</h2><p>Email, WhatsApp, and SMS creative examples with performance data</p></div>
+          <button class="btn btn-primary" onclick="openModal('addCreativeModal')"><i class="fas fa-plus"></i> Add Creative</button>
+        </div>
+
+        <div class="filter-row mb-4">
+          <span class="filter-pill active">All</span>
+          <span class="filter-pill">Email</span>
+          <span class="filter-pill">WhatsApp</span>
+          <span class="filter-pill">SMS</span>
+          <span class="filter-pill">Best Performers</span>
+          <span class="filter-pill">Urgency Hook</span>
+          <span class="filter-pill">Social Proof</span>
+        </div>
+
+        <div class="grid-3">
+          <!-- Creative Card 1 -->
+          <div class="card" style="padding:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <span class="tag tag-blue"><i class="fas fa-envelope"></i> Email</span>
+              <span class="score-pill score-high">A+ Performer</span>
+            </div>
+            <div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px;font-size:12px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--yellow);margin-bottom:6px;">"Your cart is about to disappear 👀"</div>
+              <div style="color:var(--text2);line-height:1.7;">Hi [Name], those pieces you loved are almost gone. We're holding them for just <strong style="color:var(--text)">2 more hours</strong>.<br><br>Don't let someone else snag your style →</div>
+            </div>
+            <div class="grid-3" style="text-align:center;font-size:11px;gap:6px;">
+              <div><div style="color:var(--text3)">OPEN RATE</div><div style="font-weight:700;color:var(--green);font-size:14px;">31.8%</div></div>
+              <div><div style="color:var(--text3)">CTR</div><div style="font-weight:700;color:var(--green);font-size:14px;">5.4%</div></div>
+              <div><div style="color:var(--text3)">ATC</div><div style="font-weight:700;color:var(--green);font-size:14px;">22%</div></div>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:6px;">
+              <span class="tag tag-red">Urgency</span>
+              <span class="tag tag-orange">Conversion</span>
+              <span class="tag tag-gray">Cart Recovery</span>
+            </div>
+          </div>
+
+          <!-- Creative Card 2 -->
+          <div class="card" style="padding:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <span class="tag tag-green"><i class="fab fa-whatsapp"></i> WhatsApp</span>
+              <span class="score-pill score-mid">B Performer</span>
+            </div>
+            <div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px;font-size:12px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--green);margin-bottom:6px;">Hey [Name]! 🌟</div>
+              <div style="color:var(--text2);line-height:1.7;">Just spotted you checking out our new arrivals. Great taste! 😍<br><br>Your exclusive early access link: [LINK]<br><br>Reply STOP to opt out.</div>
+            </div>
+            <div class="grid-3" style="text-align:center;font-size:11px;gap:6px;">
+              <div><div style="color:var(--text3)">OPEN RATE</div><div style="font-weight:700;color:var(--accent);font-size:14px;">68.4%</div></div>
+              <div><div style="color:var(--text3)">CTR</div><div style="font-weight:700;color:var(--accent);font-size:14px;">4.1%</div></div>
+              <div><div style="color:var(--text3)">ATC</div><div style="font-weight:700;color:var(--orange);font-size:14px;">18%</div></div>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:6px;">
+              <span class="tag tag-purple">Browse Abandonment</span>
+              <span class="tag tag-blue">Consideration</span>
+            </div>
+          </div>
+
+          <!-- Add Creative -->
+          <div class="card" style="padding:16px;border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;color:var(--text3);" onclick="openModal('addCreativeModal')">
+            <i class="fas fa-plus-circle" style="font-size:28px;"></i>
+            <div style="font-size:13px;font-weight:600;">Add Creative</div>
+            <div style="font-size:11px;text-align:center;">Paste email copy, WA template, or SMS text</div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ====== PAGE: BRAND SETUP ====== -->
+      <div id="page-brandsetup" class="page">
+        <div class="page-accent"></div>
+        <div class="section-header mb-6">
+          <div><h2>Brand Profile Setup</h2><p>Define your brand's model, channels, and benchmarks for accurate analysis</p></div>
+          <button class="btn btn-primary" onclick="saveBrandProfile()"><i class="fas fa-save"></i> Save Profile</button>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <div class="card mb-4">
+              <div class="card-title mb-4">Business Model</div>
+              <div class="form-group">
+                <label class="form-label">Brand Name</label>
+                <input type="text" class="form-control" id="bp-name" value="Luxe Fashion Co.">
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Business Model</label>
+                  <select class="form-control" id="bp-model">
+                    <option selected>DTC</option>
+                    <option>Consumable</option>
+                    <option>Fashion</option>
+                    <option>Hybrid</option>
+                    <option>High-Ticket</option>
+                    <option>Subscription</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Vertical</label>
+                  <select class="form-control" id="bp-vertical">
+                    <option selected>Fashion / Apparel</option>
+                    <option>Health & Wellness</option>
+                    <option>Beauty</option>
+                    <option>Food & Bev</option>
+                    <option>Home & Living</option>
+                    <option>Electronics</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">AOV Range (min)</label>
+                  <input type="number" class="form-control" id="bp-aov-min" value="75">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">AOV Range (max)</label>
+                  <input type="number" class="form-control" id="bp-aov-max" value="150">
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Purchase Cycle (days)</label>
+                  <input type="number" class="form-control" id="bp-cycle" value="24">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">CRM Revenue Target %</label>
+                  <input type="number" class="form-control" id="bp-crmtarget" value="40">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Discount Sensitivity</label>
+                <select class="form-control" id="bp-disc">
+                  <option>High</option>
+                  <option selected>Medium</option>
+                  <option>Low</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="card mb-4">
+              <div class="card-title mb-4">Top 3 Categories / Products</div>
+              <div class="form-group">
+                <label class="form-label">Category 1</label>
+                <input type="text" class="form-control" id="bp-cat1" value="Dresses">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Category 2</label>
+                <input type="text" class="form-control" id="bp-cat2" value="Tops & Blouses">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Category 3</label>
+                <input type="text" class="form-control" id="bp-cat3" value="Accessories">
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card mb-4">
+              <div class="card-title mb-4">Channel Mix Setup</div>
+              <div class="form-group">
+                <label class="form-label">Email %</label>
+                <input type="number" class="form-control" id="ch-email" value="55" min="0" max="100" onchange="validateChannelPct()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">WhatsApp %</label>
+                <input type="number" class="form-control" id="ch-wa" value="30" min="0" max="100" onchange="validateChannelPct()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">SMS %</label>
+                <input type="number" class="form-control" id="ch-sms" value="15" min="0" max="100" onchange="validateChannelPct()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Push %</label>
+                <input type="number" class="form-control" id="ch-push" value="0" min="0" max="100" onchange="validateChannelPct()">
+              </div>
+              <div id="ch-total-msg" style="font-size:12px;color:var(--text3);margin-top:4px;">Total: 100% ✓</div>
+            </div>
+
+            <div class="card mb-4">
+              <div class="card-title mb-4">Lifecycle % Configuration</div>
+              <div class="form-group">
+                <label class="form-label">Active %</label>
+                <input type="number" class="form-control" id="lc-active" value="40" onchange="updateLifecycleBar()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">At Risk %</label>
+                <input type="number" class="form-control" id="lc-atrisk" value="25" onchange="updateLifecycleBar()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Snoozed %</label>
+                <input type="number" class="form-control" id="lc-snoozed" value="15" onchange="updateLifecycleBar()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Lost %</label>
+                <input type="number" class="form-control" id="lc-lost" value="20" onchange="updateLifecycleBar()">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ====== PAGE: DATA UPLOAD ====== -->
+      <div id="page-datainput" class="page">
+        <div class="page-accent"></div>
+        <div class="section-header mb-6">
+          <div><h2>Data Upload & Import</h2><p>Upload campaign exports, retention reports, or set up integrations</p></div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <div class="card mb-4">
+              <div class="card-title mb-4">Upload Campaign Data</div>
+              <div class="upload-zone" onclick="triggerUpload('csvUpload')" id="dropzone">
+                <i class="fas fa-file-csv"></i>
+                <div style="font-size:14px;font-weight:700;margin-bottom:6px;">Drop CSV file or click to browse</div>
+                <div style="font-size:12px;color:var(--text3);">Supports Email, SMS, WA, and Pop-up exports from Klaviyo, Mailchimp, Sendlane, Interakt, etc.</div>
+                <input type="file" id="csvUpload" accept=".csv" style="display:none" onchange="handleFileUpload(this)">
+              </div>
+              <div id="uploadStatus" style="margin-top:12px;display:none;">
+                <div class="alert-strip success">
+                  <i class="fas fa-check-circle"></i>
+                  <strong>File uploaded:</strong> <span id="uploadedFileName">—</span>
+                </div>
+              </div>
+
+              <div class="form-grid mt-4">
+                <div class="form-group">
+                  <label class="form-label">Data Type</label>
+                  <select class="form-control">
+                    <option>Campaign Performance</option>
+                    <option>Flow Report</option>
+                    <option>Cohort Retention</option>
+                    <option>A/B Test Results</option>
+                    <option>Customer List</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Platform Source</label>
+                  <select class="form-control">
+                    <option>Klaviyo</option>
+                    <option>Mailchimp</option>
+                    <option>Sendlane</option>
+                    <option>Interakt</option>
+                    <option>AiSensy</option>
+                    <option>Custom CSV</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="processUpload()"><i class="fas fa-sync-alt"></i> Process & Refresh Dashboard</button>
+            </div>
+
+            <div class="card">
+              <div class="card-title mb-4">Manual Data Entry</div>
+              <p style="font-size:12px;color:var(--text3);margin-bottom:14px;">Don't have a CSV? Enter key metrics manually to populate the dashboard.</p>
+              <button class="btn btn-ghost" style="width:100%;margin-bottom:8px;" onclick="openModal('manualEntryModal')"><i class="fas fa-keyboard"></i> Enter Campaign Data Manually</button>
+              <button class="btn btn-ghost" style="width:100%;" onclick="openModal('addCampaignModal')"><i class="fas fa-plus"></i> Add Single Campaign Row</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="card mb-4">
+              <div class="card-title mb-4">Column Mapping Guide</div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Ensure your CSV includes these columns for full analysis:</div>
+              <table style="font-size:11.5px;">
+                <thead>
+                  <tr>
+                    <th>Required Column</th>
+                    <th>Format</th>
+                    <th>Example</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>date</td><td>YYYY-MM-DD</td><td>2024-10-14</td></tr>
+                  <tr><td>campaign_name</td><td>Text</td><td>Flash Sale Oct</td></tr>
+                  <tr><td>segment_used</td><td>Text</td><td>Churn-Risk 90d</td></tr>
+                  <tr><td>segment_excluded</td><td>Text</td><td>Recent Buyers</td></tr>
+                  <tr><td>channel</td><td>email/sms/wa/push</td><td>email</td></tr>
+                  <tr><td>intent</td><td>6 options below</td><td>conversion</td></tr>
+                  <tr><td>offer_type</td><td>Text</td><td>25% Off Code</td></tr>
+                  <tr><td>lifecycle_stage</td><td>Text</td><td>Churn Risk</td></tr>
+                  <tr><td>sent</td><td>Number</td><td>12400</td></tr>
+                  <tr><td>delivered</td><td>Number or %</td><td>11800 or 95%</td></tr>
+                  <tr><td>open_rate</td><td>%</td><td>24.3</td></tr>
+                  <tr><td>ctr</td><td>%</td><td>3.8</td></tr>
+                  <tr><td>atc_rate</td><td>%</td><td>18.4</td></tr>
+                  <tr><td>revenue</td><td>Number ($)</td><td>8900</td></tr>
+                  <tr><td>unsub_rate</td><td>%</td><td>0.32</td></tr>
+                  <tr><td>click_session_rate</td><td>%</td><td>68.4</td></tr>
+                  <tr><td>bounce_rate</td><td>%</td><td>41.2</td></tr>
+                </tbody>
+              </table>
+              <div style="margin-top:12px;font-size:11px;color:var(--text3);">Intent options: awareness · education · consideration · conversion · retention · winback</div>
+            </div>
+
+            <div class="card">
+              <div class="card-title mb-4">Integrations</div>
+              <div style="display:grid;gap:8px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
+                  <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;">
+                    <i class="fas fa-plug" style="color:var(--accent);"></i> Klaviyo
+                  </div>
+                  <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
+                  <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;">
+                    <i class="fab fa-whatsapp" style="color:var(--green);"></i> Interakt / AiSensy
+                  </div>
+                  <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
+                  <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;">
+                    <i class="fas fa-chart-bar" style="color:var(--orange);"></i> Google Analytics 4
+                  </div>
+                  <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
+                  <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;">
+                    <i class="fab fa-shopify" style="color:#95bf47;"></i> Shopify
+                  </div>
+                  <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ====== MODALS ====== -->
+
+<!-- Add Campaign Modal -->
+<div class="modal-overlay" id="addCampaignModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Campaign</div>
+      <button class="modal-close" onclick="closeModal('addCampaignModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-control" id="nc-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Campaign Name</label>
+        <input type="text" class="form-control" id="nc-name" placeholder="e.g. Flash Sale Nov">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Segment Used</label>
+        <input type="text" class="form-control" id="nc-seg" placeholder="e.g. Churn Risk 90d">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Segment Excluded</label>
+        <input type="text" class="form-control" id="nc-segx" placeholder="e.g. Recent Buyers 30d">
+      </div>
+    </div>
+    <div class="form-grid-3">
+      <div class="form-group">
+        <label class="form-label">Channel</label>
+        <select class="form-control" id="nc-channel">
+          <option value="email">Email</option>
+          <option value="wa">WhatsApp</option>
+          <option value="sms">SMS</option>
+          <option value="push">Push</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Intent</label>
+        <select class="form-control" id="nc-intent">
+          <option value="awareness">Awareness</option>
+          <option value="education">Education</option>
+          <option value="consideration">Consideration</option>
+          <option value="conversion" selected>Conversion</option>
+          <option value="retention">Retention</option>
+          <option value="winback">Winback</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Offer Type</label>
+        <input type="text" class="form-control" id="nc-offer" placeholder="e.g. 20% Off Code">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Lifecycle Stage</label>
+      <select class="form-control" id="nc-lifecycle">
+        <option>Active</option>
+        <option>At Risk</option>
+        <option>Churn Risk</option>
+        <option>Lapsed 90d</option>
+        <option>Lapsed 180d</option>
+        <option>VIP</option>
+        <option>New Subscriber</option>
+      </select>
+    </div>
+    <div class="form-grid-3">
+      <div class="form-group">
+        <label class="form-label">Sent</label>
+        <input type="number" class="form-control" id="nc-sent" placeholder="12400">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Delivered</label>
+        <input type="number" class="form-control" id="nc-deliv" placeholder="11800">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Revenue ($)</label>
+        <input type="number" class="form-control" id="nc-revenue" placeholder="8900">
+      </div>
+    </div>
+    <div class="form-grid-3">
+      <div class="form-group">
+        <label class="form-label">Open Rate (%)</label>
+        <input type="number" class="form-control" id="nc-or" step="0.1" placeholder="24.3">
+      </div>
+      <div class="form-group">
+        <label class="form-label">CTR (%)</label>
+        <input type="number" class="form-control" id="nc-ctr" step="0.1" placeholder="3.8">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ATC Rate (%)</label>
+        <input type="number" class="form-control" id="nc-atc" step="0.1" placeholder="18.4">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Unsub / Opt-Out Rate (%)</label>
+        <input type="number" class="form-control" id="nc-unsub" step="0.01" placeholder="0.32">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Click → Session Rate (%)</label>
+        <input type="number" class="form-control" id="nc-session" step="0.1" placeholder="68.4">
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="addCampaignRow()"><i class="fas fa-plus"></i> Add Campaign</button>
+  </div>
+</div>
+
+<!-- Brand Switch Modal -->
+<div class="modal-overlay" id="brandModal">
+  <div class="modal" style="width:480px;">
+    <div class="modal-header">
+      <div class="modal-title">Switch Brand</div>
+      <button class="modal-close" onclick="closeModal('brandModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="brandList">
+      <!-- Injected by JS -->
+    </div>
+    <hr style="border-color:var(--border);margin:14px 0;">
+    <button class="btn btn-ghost" style="width:100%;" onclick="openModal('newBrandModal');closeModal('brandModal')"><i class="fas fa-plus"></i> Add New Brand</button>
+  </div>
+</div>
+
+<!-- New Brand Modal -->
+<div class="modal-overlay" id="newBrandModal">
+  <div class="modal" style="width:480px;">
+    <div class="modal-header">
+      <div class="modal-title">Add New Brand</div>
+      <button class="modal-close" onclick="closeModal('newBrandModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Brand Name</label>
+      <input type="text" class="form-control" id="nb-name" placeholder="e.g. GlowSkin DTC">
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Model</label>
+        <select class="form-control" id="nb-model">
+          <option>DTC</option><option>Consumable</option><option>Fashion</option><option>Hybrid</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Vertical</label>
+        <select class="form-control" id="nb-vertical">
+          <option>Fashion</option><option>Health</option><option>Beauty</option><option>Food</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="addBrand()">Add Brand</button>
+  </div>
+</div>
+
+<!-- Add Flow Modal -->
+<div class="modal-overlay" id="addFlowModal">
+  <div class="modal" style="width:520px;">
+    <div class="modal-header">
+      <div class="modal-title">Add / Edit Flow</div>
+      <button class="modal-close" onclick="closeModal('addFlowModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Flow Name</label>
+      <input type="text" class="form-control" placeholder="e.g. Post-Purchase Upsell">
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Flow Type</label>
+        <select class="form-control">
+          <option>Cart Recovery</option><option>Browse Abandonment</option><option>Welcome</option>
+          <option>Win-Back</option><option>Post-Purchase</option><option>Replenishment</option><option>Loyalty</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-control">
+          <option>Active</option><option>Paused</option><option>Under Review</option><option>Draft</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid-3">
+      <div class="form-group">
+        <label class="form-label">Revenue ($)</label>
+        <input type="number" class="form-control" placeholder="24800">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Conv. Rate (%)</label>
+        <input type="number" class="form-control" placeholder="8.4">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Open Rate (%)</label>
+        <input type="number" class="form-control" placeholder="38">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Trigger Description</label>
+      <input type="text" class="form-control" placeholder="e.g. Cart abandoned for 1 hour">
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="showToast('Flow saved successfully!','success');closeModal('addFlowModal')">Save Flow</button>
+  </div>
+</div>
+
+<!-- KPI Edit Modal -->
+<div class="modal-overlay" id="kpiEditModal">
+  <div class="modal" style="width:380px;">
+    <div class="modal-header">
+      <div class="modal-title" id="kpiEditTitle">Edit KPI</div>
+      <button class="modal-close" onclick="closeModal('kpiEditModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="form-group">
+      <label class="form-label" id="kpiEditLabel">Value</label>
+      <input type="text" class="form-control" id="kpiEditInput" placeholder="Enter new value">
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="saveKpiEdit()">Update</button>
+  </div>
+</div>
+
+<!-- A/B Test Modal -->
+<div class="modal-overlay" id="addABModal">
+  <div class="modal" style="width:580px;">
+    <div class="modal-header">
+      <div class="modal-title">Log A/B Test</div>
+      <button class="modal-close" onclick="closeModal('addABModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Test Name</label>
+        <input type="text" class="form-control" placeholder="e.g. Subject Line Test — Nov">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-control">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Channel</label>
+        <select class="form-control"><option>Email</option><option>WhatsApp</option><option>SMS</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sample Size (n)</label>
+        <input type="number" class="form-control" placeholder="8400">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Variant A Description</label>
+      <input type="text" class="form-control" placeholder="e.g. 'Last chance: 25% off ends tonight'">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Variant A — Key Metric</label>
+      <input type="text" class="form-control" placeholder="e.g. OR: 24.2%, CTR: 3.1%">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Variant B Description</label>
+      <input type="text" class="form-control" placeholder="e.g. 'Your cart is about to disappear 👀'">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Variant B — Key Metric</label>
+      <input type="text" class="form-control" placeholder="e.g. OR: 31.8%, CTR: 5.4%">
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Winner</label>
+        <select class="form-control"><option>Variant A</option><option>Variant B</option><option>Inconclusive</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Significance</label>
+        <select class="form-control"><option>Significant (p&lt;0.05)</option><option>Borderline</option><option>Not Significant</option></select>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="showToast('A/B test logged!','success');closeModal('addABModal')">Save Test</button>
+  </div>
+</div>
+
+<!-- Add Creative Modal -->
+<div class="modal-overlay" id="addCreativeModal">
+  <div class="modal" style="width:560px;">
+    <div class="modal-header">
+      <div class="modal-title">Add Creative</div>
+      <button class="modal-close" onclick="closeModal('addCreativeModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Channel</label>
+        <select class="form-control"><option>Email</option><option>WhatsApp</option><option>SMS</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hook Type</label>
+        <select class="form-control"><option>Urgency/Scarcity</option><option>Social Proof/UGC</option><option>Product Feature</option><option>Discount/Offer</option><option>Storytelling</option><option>Educational</option></select>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Offer Type</label>
+        <input type="text" class="form-control" placeholder="e.g. 25% Off Code">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Intent</label>
+        <select class="form-control"><option>Conversion</option><option>Consideration</option><option>Retention</option><option>Winback</option><option>Awareness</option></select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Subject Line / Opening Hook</label>
+      <input type="text" class="form-control" placeholder="e.g. Your cart is about to disappear 👀">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Body Copy</label>
+      <textarea class="form-control" rows="5" placeholder="Paste email body, WA template, or SMS text here..."></textarea>
+    </div>
+    <div class="form-grid-3">
+      <div class="form-group"><label class="form-label">Open Rate (%)</label><input type="number" class="form-control" step="0.1"></div>
+      <div class="form-group"><label class="form-label">CTR (%)</label><input type="number" class="form-control" step="0.1"></div>
+      <div class="form-group"><label class="form-label">ATC Rate (%)</label><input type="number" class="form-control" step="0.1"></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="showToast('Creative added to library!','success');closeModal('addCreativeModal')">Save Creative</button>
+  </div>
+</div>
+
+<!-- Lifecycle Edit Modal -->
+<div class="modal-overlay" id="lifecycleEditModal">
+  <div class="modal" style="width:400px;">
+    <div class="modal-header">
+      <div class="modal-title">Edit Lifecycle Distribution</div>
+      <button class="modal-close" onclick="closeModal('lifecycleEditModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="alert-strip info mb-4"><i class="fas fa-info-circle"></i> Values must total 100%</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Active %</label><input type="number" class="form-control" value="40" id="lce-active"></div>
+      <div class="form-group"><label class="form-label">At Risk %</label><input type="number" class="form-control" value="25" id="lce-atrisk"></div>
+      <div class="form-group"><label class="form-label">Snoozed %</label><input type="number" class="form-control" value="15" id="lce-snoozed"></div>
+      <div class="form-group"><label class="form-label">Lost %</label><input type="number" class="form-control" value="20" id="lce-lost"></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="applyLifecycleEdit()">Apply Changes</button>
+  </div>
+</div>
+
+<!-- Freq Cap Modal -->
+<div class="modal-overlay" id="freqCapModal">
+  <div class="modal" style="width:420px;">
+    <div class="modal-header">
+      <div class="modal-title">Set Global Frequency Caps</div>
+      <button class="modal-close" onclick="closeModal('freqCapModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="form-group"><label class="form-label">Max Email / Week</label><input type="number" class="form-control" value="3"></div>
+    <div class="form-group"><label class="form-label">Max WhatsApp / Week</label><input type="number" class="form-control" value="2"></div>
+    <div class="form-group"><label class="form-label">Max SMS / Week</label><input type="number" class="form-control" value="1"></div>
+    <div class="form-group"><label class="form-label">Max Total / Week</label><input type="number" class="form-control" value="5"></div>
+    <div class="form-group">
+      <label class="form-label">Global Suppression Window</label>
+      <select class="form-control">
+        <option>24 hours after unsub signal</option>
+        <option>48 hours</option>
+        <option>7 days after any unsub signal</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="showToast('Frequency caps saved!','success');closeModal('freqCapModal')">Save Caps</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// ===================== DATA =====================
+const brands = [
+  { id:'brand1', name:'Luxe Fashion Co.', type:'DTC · Fashion · Medium AOV', model:'DTC Fashion', vertical:'Fashion', aov:'$75–$150' },
+  { id:'brand2', name:'HealthSupps DTC', type:'Consumable · High Frequency · Low AOV', model:'Consumable DTC', vertical:'Health', aov:'$30–$60' },
+];
+let activeBrand = brands[0];
+
+const campaignData = [
+  { date:'Oct 14', name:'Flash Sale — End of Season', seg:'Churn Risk 90d', segx:'Recent Buyers 30d', channel:'email', intent:'conversion', offer:'25% Off Code', lifecycle:'Churn Risk', sent:'18,400', deliv:'94%', or:'21.4%', ctr:'3.2%', atc:'18%', revenue:'$12,400', unsub:'0.44%' },
+  { date:'Oct 8', name:'New Arrivals Drop', seg:'Active Buyers', segx:'VIP (sep flow)', channel:'email', intent:'awareness', offer:'No Offer', lifecycle:'Active', sent:'24,100', deliv:'96%', or:'34.2%', ctr:'2.8%', atc:'14%', revenue:'$9,800', unsub:'0.10%' },
+  { date:'Oct 22', name:'Last Chance Flash', seg:'Churn Risk', segx:'None', channel:'wa', intent:'conversion', offer:'25% Off Code', lifecycle:'Churn Risk', sent:'12,400', deliv:'92%', or:'—', ctr:'2.8%', atc:'18%', revenue:'$8,900', unsub:'High Opt-Out' },
+  { date:'Oct 18', name:'Welcome to the Family', seg:'New Subscribers', segx:'None', channel:'email', intent:'awareness', offer:'10% Welcome', lifecycle:'New Sub', sent:'8,200', deliv:'98%', or:'52.1%', ctr:'5.4%', atc:'28%', revenue:'$6,800', unsub:'0.08%' },
+  { date:'Oct 10', name:'VIP Early Access', seg:'VIP Buyers', segx:'None', channel:'wa', intent:'retention', offer:'Early Access', lifecycle:'VIP', sent:'2,840', deliv:'99%', or:'—', ctr:'8.2%', atc:'34%', revenue:'$18,200', unsub:'0.04%' },
+  { date:'Oct 5', name:'Product Education — Hero SKU', seg:'Browse Only', segx:'Buyers 60d', channel:'email', intent:'education', offer:'None', lifecycle:'Browse Only', sent:'14,500', deliv:'93%', or:'28.4%', ctr:'2.1%', atc:'8%', revenue:'$3,400', unsub:'0.12%' },
+  { date:'Sep 28', name:'Win-Back 180d Lapsed', seg:'Lapsed 180d', segx:'None', channel:'email', intent:'winback', offer:'20% + Free Ship', lifecycle:'Lapsed', sent:'6,100', deliv:'88%', or:'18.8%', ctr:'2.8%', atc:'9%', revenue:'$4,100', unsub:'0.28%' },
+];
+
+// ===================== NAV =====================
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+  
+  const titles = {
+    overview:'Overview', campaigns:'Campaign Deep Dive', flows:'Journey & Flows', 
+    retention:'Retention & Cohorts', frequency:'Frequency & Fatigue',
+    intent:'Intent Analysis', postclick:'Post-Click Signals', abtests:'A/B Test History',
+    creative:'Creative Library', brandsetup:'Brand Profile', datainput:'Data Upload'
+  };
+  document.getElementById('pageTitle').textContent = titles[id] || id;
+
+  // Init page-specific stuff
+  if (id === 'campaigns') renderCampaignTable();
+  if (id === 'retention') renderCohortTable();
+  if (id === 'frequency') buildHeatmap();
+  if (id === 'brandsetup') renderBrandList();
+}
+
+// ===================== MODALS =====================
+function openModal(id) {
+  if (id === 'brandModal') renderBrandSwitcher();
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ===================== BRAND SWITCHER =====================
+function renderBrandSwitcher() {
+  const list = document.getElementById('brandList');
+  list.innerHTML = brands.map(b => `
+    <div onclick="switchBrand('${b.id}')" style="padding:12px 16px;border-radius:10px;cursor:pointer;border:1px solid ${b.id===activeBrand.id?'var(--accent)':'var(--border)'};background:${b.id===activeBrand.id?'rgba(79,142,247,0.08)':'var(--surface2)'};margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-weight:700;font-size:13px;">${b.name}</div>
+        <div style="font-size:11px;color:var(--text3);">${b.type}</div>
+      </div>
+      ${b.id===activeBrand.id ? '<i class="fas fa-check-circle" style="color:var(--accent);"></i>' : ''}
+    </div>
+  `).join('');
+}
+
+function switchBrand(id) {
+  activeBrand = brands.find(b => b.id === id);
+  document.getElementById('activeBrandName').textContent = activeBrand.name;
+  document.getElementById('activeBrandType').textContent = activeBrand.type;
+  document.getElementById('overview-model').textContent = activeBrand.model;
+  closeModal('brandModal');
+  showToast(`Switched to ${activeBrand.name}`, 'success');
+  refreshAllCharts();
+}
+
+function addBrand() {
+  const name = document.getElementById('nb-name').value.trim();
+  if (!name) return;
+  const model = document.getElementById('nb-model').value;
+  const vertical = document.getElementById('nb-vertical').value;
+  const id = 'brand' + Date.now();
+  brands.push({ id, name, type: `${model} · ${vertical}`, model, vertical, aov: '—' });
+  closeModal('newBrandModal');
+  showToast(`Brand "${name}" added!`, 'success');
+}
+
+function renderBrandList() {}
+
+// ===================== CAMPAIGN TABLE =====================
+function renderCampaignTable(filter='all', search='') {
+  const tbody = document.getElementById('campaignTbody');
+  const rows = campaignData.filter(c => {
+    const matchFilter = filter === 'all' || c.intent === filter;
+    const matchSearch = !search || c.name.toLowerCase().includes(search) || c.seg.toLowerCase().includes(search);
+    return matchFilter && matchSearch;
+  });
+  
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="14"><div class="empty-state"><i class="fas fa-search"></i><p>No campaigns match your filters.</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(c => {
+    const ch = { email:'<i class="fas fa-envelope ch-email"></i> Email', wa:'<i class="fab fa-whatsapp ch-wa"></i> WhatsApp', sms:'<i class="fas fa-sms ch-sms"></i> SMS', push:'<i class="fas fa-bell ch-push"></i> Push' }[c.channel] || c.channel;
+    const unsubColor = parseFloat(c.unsub) > 0.4 ? 'var(--red)' : parseFloat(c.unsub) > 0.2 ? 'var(--orange)' : 'var(--green)';
+    const revNum = parseInt(c.revenue.replace(/\D/g,''));
+    const revColor = revNum > 10000 ? 'var(--green)' : revNum > 5000 ? 'var(--text)' : 'var(--text2)';
+    return `
+      <tr data-intent="${c.intent}">
+        <td><strong style="font-size:13px;">${c.name}</strong><br><span style="font-size:10px;color:var(--text3);">${c.date}</span></td>
+        <td><span style="font-size:11px;color:var(--text2);">${c.seg}</span></td>
+        <td><span style="font-size:11px;color:var(--text3);">${c.segx}</span></td>
+        <td>${ch}</td>
+        <td><span class="tag intent-${c.intent}">${c.intent.charAt(0).toUpperCase()+c.intent.slice(1)}</span></td>
+        <td style="font-size:12px;">${c.offer}</td>
+        <td><span class="tag tag-gray" style="font-size:10px;">${c.lifecycle}</span></td>
+        <td style="font-size:12px;">${c.sent} / <span style="color:var(--green)">${c.deliv}</span></td>
+        <td style="font-size:12px;">${c.or}</td>
+        <td style="font-size:12px;color:var(--accent);font-weight:600;">${c.ctr}</td>
+        <td style="font-size:12px;">${c.atc}</td>
+        <td style="font-weight:700;color:${revColor};">${c.revenue}</td>
+        <td style="color:${unsubColor};font-size:12px;">${c.unsub}</td>
+        <td>
+          <div class="row-actions">
+            <button class="btn btn-ghost btn-sm" onclick="showToast('Opening campaign detail…','success')" title="View"><i class="fas fa-eye"></i></button>
+            <button class="btn btn-ghost btn-sm" onclick="duplicateRow()" title="Duplicate"><i class="fas fa-copy"></i></button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+let activeIntentFilter = 'all';
+function filterTable(el, intent) {
+  activeIntentFilter = intent;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  renderCampaignTable(intent);
+}
+function searchTable(val) { renderCampaignTable(activeIntentFilter, val.toLowerCase()); }
+function sortTable(key) {
+  if (!key) return;
+  const map = { revenue:11, ctr:9, openrate:8, unsub:12 };
+  const col = map[key];
+  campaignData.sort((a,b) => {
+    const vals = [a,b].map(c => [a.revenue,a.ctr,a.or,a.unsub][Object.values(map).indexOf(col)] || '');
+    return 0;
+  });
+  renderCampaignTable(activeIntentFilter);
+}
+function sortCol(n) { renderCampaignTable(activeIntentFilter); }
+function duplicateRow() { showToast('Campaign duplicated!', 'success'); }
+
+function addCampaignRow() {
+  const row = {
+    date: document.getElementById('nc-date').value,
+    name: document.getElementById('nc-name').value,
+    seg: document.getElementById('nc-seg').value || '—',
+    segx: document.getElementById('nc-segx').value || '—',
+    channel: document.getElementById('nc-channel').value,
+    intent: document.getElementById('nc-intent').value,
+    offer: document.getElementById('nc-offer').value || '—',
+    lifecycle: document.getElementById('nc-lifecycle').value,
+    sent: document.getElementById('nc-sent').value || '—',
+    deliv: document.getElementById('nc-deliv').value || '—',
+    or: (document.getElementById('nc-or').value || '—') + '%',
+    ctr: (document.getElementById('nc-ctr').value || '—') + '%',
+    atc: (document.getElementById('nc-atc').value || '—') + '%',
+    revenue: '$' + (document.getElementById('nc-revenue').value || '0'),
+    unsub: (document.getElementById('nc-unsub').value || '0') + '%',
+  };
+  campaignData.unshift(row);
+  closeModal('addCampaignModal');
+  renderCampaignTable();
+  showToast('Campaign added!', 'success');
+}
+
+// ===================== COHORT TABLE =====================
+const cohorts = [
+  { month:'Jan 2024', size:'3,210', data:[100,28,19,14,11,8] },
+  { month:'Feb 2024', size:'4,080', data:[100,31,22,16,13,10] },
+  { month:'Mar 2024', size:'5,140', data:[100,26,17,12,9,7] },
+  { month:'Apr 2024', size:'4,420', data:[100,33,24,18,14,11] },
+  { month:'May 2024', size:'6,800', data:[100,29,20,15,12,'—'] },
+  { month:'Jun 2024', size:'7,200', data:[100,34,23,17,'—','—'] },
+];
+
+function getCohortColor(val) {
+  if (val === '—' || val === 100) return '';
+  if (val >= 25) return 'rgba(34,211,165,0.2)';
+  if (val >= 15) return 'rgba(79,142,247,0.2)';
+  if (val >= 10) return 'rgba(249,160,63,0.15)';
+  return 'rgba(244,80,107,0.1)';
+}
+
+function renderCohortTable() {
+  const tbody = document.getElementById('cohortTbody');
+  tbody.innerHTML = cohorts.map(c => `
+    <tr>
+      <td><strong>${c.month}</strong></td>
+      <td style="color:var(--text2);">${c.size}</td>
+      ${c.data.map((v,i) => `<td style="background:${getCohortColor(v)};border-radius:6px;text-align:center;font-weight:600;font-size:12px;">${v === '—' ? '<span style="color:var(--text3)">—</span>' : i===0?'<span style="color:var(--text3)">Base</span>':v+'%'}</td>`).join('')}
+    </tr>
+  `).join('');
+}
+
+// ===================== HEATMAP =====================
+function buildHeatmap() {
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const times = ['6a','9a','12p','3p','6p','9p','12a','3a'];
+  const heat = [
+    [10,28,22,18,12,8,4,2],
+    [12,32,26,20,14,6,3,1],
+    [8,24,30,22,16,10,5,2],
+    [14,36,28,24,18,8,4,2],
+    [16,30,24,20,14,8,6,3],
+    [6,14,18,16,22,18,8,4],
+    [4,8,12,14,18,24,10,5],
+  ];
+  const div = document.getElementById('timingHeatmap');
+  div.innerHTML = '';
+  div.style.gridTemplateColumns = `repeat(${times.length+1},1fr)`;
+  
+  // header
+  div.innerHTML += `<div style="font-size:9px;color:var(--text3);padding:4px;"></div>`;
+  times.forEach(t => div.innerHTML += `<div style="font-size:9px;color:var(--text3);text-align:center;padding:4px;">${t}</div>`);
+  
+  days.forEach((day, di) => {
+    div.innerHTML += `<div style="font-size:9px;color:var(--text3);padding:4px;display:flex;align-items:center;">${day}</div>`;
+    heat[di].forEach(v => {
+      const intensity = v / 36;
+      const bg = `rgba(79,142,247,${intensity.toFixed(2)})`;
+      const border = v > 28 ? '1px solid rgba(79,142,247,0.5)' : '1px solid transparent';
+      div.innerHTML += `<div style="background:${bg};border:${border};border-radius:4px;height:28px;cursor:default;" title="${v}% engagement" data-tooltip="${v}% open rate"></div>`;
+    });
+  });
+}
+
+// ===================== KPI EDIT =====================
+let currentKpi = null;
+const kpiConfig = {
+  aov: { title:'Edit Average Order Value', label:'AOV ($)', id:'kpi-aov' },
+  crm: { title:'Edit CRM Revenue %', label:'CRM Revenue %', id:'kpi-crm' },
+  cycle: { title:'Edit Purchase Cycle', label:'Cycle (e.g. 24 Days)', id:'kpi-cycle' },
+  disc: { title:'Edit Discount Sensitivity', label:'Sensitivity (HIGH/MEDIUM/LOW)', id:'kpi-disc' },
+};
+
+function openKpiModal(kpi) {
+  currentKpi = kpi;
+  const cfg = kpiConfig[kpi];
+  document.getElementById('kpiEditTitle').textContent = cfg.title;
+  document.getElementById('kpiEditLabel').textContent = cfg.label;
+  document.getElementById('kpiEditInput').value = document.getElementById(cfg.id).textContent;
+  openModal('kpiEditModal');
+}
+function saveKpiEdit() {
+  const val = document.getElementById('kpiEditInput').value;
+  document.getElementById(kpiConfig[currentKpi].id).textContent = val;
+  closeModal('kpiEditModal');
+  showToast('KPI updated!', 'success');
+}
+
+// ===================== LIFECYCLE =====================
+function applyLifecycleEdit() {
+  const a = parseInt(document.getElementById('lce-active').value)||0;
+  const r = parseInt(document.getElementById('lce-atrisk').value)||0;
+  const s = parseInt(document.getElementById('lce-snoozed').value)||0;
+  const l = parseInt(document.getElementById('lce-lost').value)||0;
+  const total = a+r+s+l;
+  if (total !== 100) { showToast(`Total is ${total}% — must be 100%`,'error'); return; }
+  
+  const segs = document.querySelectorAll('.lifecycle-seg');
+  const vals = [a,r,s,l];
+  const labels = ['ACTIVE','AT RISK','SNOOZED','LOST'];
+  segs.forEach((seg,i) => {
+    seg.style.flex = vals[i]/25 + '';
+    seg.innerHTML = `<span>${vals[i]}%</span><div style="font-size:9px;opacity:0.85;">${labels[i]}</div>`;
+  });
+  closeModal('lifecycleEditModal');
+  showToast('Lifecycle distribution updated!', 'success');
+}
+
+function filterLifecycle(seg) {
+  showToast(`Filtering by: ${seg.replace('atrisk','At Risk').toUpperCase()}`, 'success');
+}
+
+function updateLifecycleBar() {} // called from brand setup
+
+// ===================== CHANNEL PCT VALIDATION =====================
+function validateChannelPct() {
+  const vals = ['ch-email','ch-wa','ch-sms','ch-push'].map(id => parseInt(document.getElementById(id).value)||0);
+  const total = vals.reduce((a,b)=>a+b,0);
+  const msg = document.getElementById('ch-total-msg');
+  msg.textContent = `Total: ${total}%${total===100?' ✓':' ✗ Must equal 100%'}`;
+  msg.style.color = total === 100 ? 'var(--green)' : 'var(--red)';
+  // Update overview bars
+  document.getElementById('pct-email').textContent = vals[0]+'%';
+  document.getElementById('bar-email').style.width = vals[0]+'%';
+  document.getElementById('pct-wa').textContent = vals[1]+'%';
+  document.getElementById('bar-wa').style.width = vals[1]+'%';
+  document.getElementById('pct-sms').textContent = vals[2]+'%';
+  document.getElementById('bar-sms').style.width = vals[2]+'%';
+}
+
+// ===================== BRAND PROFILE SAVE =====================
+function saveBrandProfile() {
+  const name = document.getElementById('bp-name').value;
+  const model = document.getElementById('bp-model').value;
+  const vertical = document.getElementById('bp-vertical').value;
+  document.getElementById('activeBrandName').textContent = name;
+  document.getElementById('activeBrandType').textContent = `${model} · ${vertical}`;
+  document.getElementById('overview-model').textContent = `${model} ${vertical}`;
+  document.getElementById('overview-topcat').textContent = document.getElementById('bp-cat1').value;
+  showToast('Brand profile saved!', 'success');
+}
+
+// ===================== UPLOAD =====================
+function triggerUpload(id) { document.getElementById(id).click(); }
+function handleFileUpload(input) {
+  if (!input.files.length) return;
+  document.getElementById('uploadedFileName').textContent = input.files[0].name;
+  document.getElementById('uploadStatus').style.display = 'block';
+}
+function processUpload() {
+  showToast('Processing file… Dashboard will refresh shortly.', 'success');
+}
+
+// ===================== TOAST =====================
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.style.borderColor = type === 'success' ? 'var(--green)' : type === 'error' ? 'var(--red)' : 'var(--accent)';
+  t.style.color = type === 'success' ? 'var(--green)' : type === 'error' ? 'var(--red)' : 'var(--accent)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ===================== EXPORT =====================
+function exportReport() {
+  showToast('PDF export in progress…', 'success');
+}
+
+// ===================== DATE RANGE =====================
+document.getElementById('dateRangeFilter').addEventListener('change', function() {
+  const custom = this.value === 'custom';
+  document.getElementById('dateFrom').style.display = custom ? 'block' : 'none';
+  document.getElementById('dateTo').style.display = custom ? 'block' : 'none';
+  refreshAllCharts();
+});
+
+// ===================== CHARTS =====================
+let charts = {};
+
+function makeChart(id, config) {
+  if (charts[id]) charts[id].destroy();
+  const el = document.getElementById(id);
+  if (!el) return;
+  charts[id] = new Chart(el, config);
+  return charts[id];
+}
+
+const gridColor = 'rgba(255,255,255,0.05)';
+const tickColor = '#555c72';
+const baseChartDefaults = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { labels: { color: '#8b91a8', font:{ size:11 } } } },
+  scales: {
+    x: { grid: { color: gridColor }, ticks: { color: tickColor, font:{size:10} } },
+    y: { grid: { color: gridColor }, ticks: { color: tickColor, font:{size:10} } }
+  }
+};
+
+function initCharts() {
+  // Revenue by Channel
+  makeChart('revChannelChart', {
+    type: 'bar',
+    data: {
+      labels: ['Email', 'WhatsApp', 'SMS', 'Push'],
+      datasets: [{
+        label: 'Revenue ($)',
+        data: [45000, 18000, 8000, 2000],
+        backgroundColor: ['rgba(79,142,247,0.7)','rgba(34,211,165,0.7)','rgba(249,160,63,0.7)','rgba(123,94,167,0.7)'],
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: { ...baseChartDefaults }
+  });
+
+  // Intent Radar
+  makeChart('intentChart', {
+    type: 'radar',
+    data: {
+      labels: ['Awareness','Education','Consideration','Conversion','Retention','Winback'],
+      datasets: [{
+        label: 'Campaign Mix %',
+        data: [15,10,20,40,10,5],
+        borderColor: '#4f8ef7',
+        backgroundColor: 'rgba(79,142,247,0.15)',
+        pointBackgroundColor: '#4f8ef7',
+        pointRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color:'#8b91a8', font:{size:11} } } },
+      scales: {
+        r: {
+          grid: { color:'rgba(255,255,255,0.05)' },
+          pointLabels: { color:'#8b91a8', font:{size:10} },
+          ticks: { display:false },
+          angleLines: { color:'rgba(255,255,255,0.05)' },
+        }
+      }
+    }
+  });
+
+  // Revenue Trend
+  makeChart('trendChart', {
+    type: 'line',
+    data: {
+      labels: ['W1','W2','W3','W4','W5','W6','W7','W8'],
+      datasets: [{
+        label: 'Email',
+        data: [8200,9100,7800,11200,10400,12800,11600,14200],
+        borderColor:'#4f8ef7', backgroundColor:'rgba(79,142,247,0.08)',
+        tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#4f8ef7',
+      },{
+        label: 'WhatsApp',
+        data: [3200,4100,3600,5200,4800,6100,5800,7200],
+        borderColor:'#22d3a5', backgroundColor:'transparent',
+        tension:0.4, fill:false, pointRadius:3, pointBackgroundColor:'#22d3a5', borderDash:[4,2],
+      }]
+    },
+    options: { ...baseChartDefaults }
+  });
+
+  // Campaign — Intent Revenue
+  makeChart('intentRevChart', {
+    type: 'bar',
+    data: {
+      labels: ['Conversion','Retention','Awareness','Consideration','Winback','Education'],
+      datasets: [{
+        label: 'Revenue ($)',
+        data: [48200,18600,8400,14800,6800,5200],
+        backgroundColor: ['#f4506b','#f9a03f','#4f8ef7','#22d3a5','#fcd34d','#7b5ea7'].map(c=>c+'bb'),
+        borderRadius:6, borderSkipped:false,
+      }]
+    },
+    options: { ...baseChartDefaults }
+  });
+
+  // Campaign — CTR by Channel
+  makeChart('ctrChannelChart', {
+    type: 'bar',
+    data: {
+      labels: ['Email','WhatsApp','SMS','Push'],
+      datasets: [
+        { label:'Avg CTR', data:[3.2,5.8,2.4,1.8], backgroundColor:'rgba(79,142,247,0.7)', borderRadius:6, borderSkipped:false },
+        { label:'Top CTR', data:[5.4,8.2,4.1,3.2], backgroundColor:'rgba(34,211,165,0.4)', borderRadius:6, borderSkipped:false },
+      ]
+    },
+    options: { ...baseChartDefaults }
+  });
+
+  // Flow Share
+  makeChart('flowShareChart', {
+    type: 'doughnut',
+    data: {
+      labels: ['Cart Recovery','Welcome Series','Browse Abandonment','Win-Back'],
+      datasets: [{
+        data: [24800,18200,11400,6100],
+        backgroundColor: ['rgba(79,142,247,0.8)','rgba(34,211,165,0.8)','rgba(123,94,167,0.8)','rgba(249,160,63,0.8)'],
+        borderWidth: 0, hoverOffset:8,
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: { legend:{ position:'right', labels:{ color:'#8b91a8', font:{size:10}, padding:12 } } },
+      cutout:'65%',
+    }
+  });
+
+  // Retention Curve
+  makeChart('retentionChart', {
+    type: 'line',
+    data: {
+      labels: ['Day 1','Day 7','Day 14','Day 30','Day 60','Day 90'],
+      datasets: [{
+        label: 'This Period',
+        data: [100,52,32,18.4,12.1,8.9],
+        borderColor:'#4f8ef7', backgroundColor:'rgba(79,142,247,0.08)',
+        tension:0.4, fill:true, pointRadius:4, pointBackgroundColor:'#4f8ef7',
+      },{
+        label: 'Industry Avg',
+        data: [100,48,28,16,10,7.2],
+        borderColor:'rgba(255,255,255,0.2)', backgroundColor:'transparent',
+        tension:0.4, fill:false, pointRadius:2, borderDash:[4,4],
+      }]
+    },
+    options: { ...baseChartDefaults }
+  });
+
+  // Freq Distribution
+  makeChart('freqDistChart', {
+    type: 'bar',
+    data: {
+      labels: ['1x','2x','3x','4x','5x','6x+'],
+      datasets: [{
+        label: 'Customers',
+        data: [4200,8100,6800,3400,1800,900],
+        backgroundColor: 'rgba(79,142,247,0.6)',
+        borderRadius:6, borderSkipped:false,
+      }]
+    },
+    options: { ...baseChartDefaults }
+  });
+
+  // Frequency vs Engagement
+  makeChart('freqEngageChart', {
+    type: 'line',
+    data: {
+      labels: ['1/wk','2/wk','3/wk','4/wk','5/wk','6/wk','7+/wk'],
+      datasets: [{
+        label: 'Open Rate %',
+        data: [34,31,28,24,20,16,12],
+        borderColor:'#4f8ef7', tension:0.4, pointRadius:4, pointBackgroundColor:'#4f8ef7', fill:false,
+      },{
+        label: 'Unsub Rate %',
+        data: [0.05,0.08,0.14,0.22,0.34,0.52,0.82],
+        borderColor:'#f4506b', tension:0.4, pointRadius:4, pointBackgroundColor:'#f4506b', fill:false, yAxisID:'y1',
+      }]
+    },
+    options: {
+      ...baseChartDefaults,
+      scales: {
+        x: { grid:{color:gridColor}, ticks:{color:tickColor,font:{size:10}} },
+        y: { grid:{color:gridColor}, ticks:{color:'#4f8ef7',font:{size:10}}, position:'left' },
+        y1: { grid:{display:false}, ticks:{color:'#f4506b',font:{size:10}}, position:'right' },
+      }
+    }
+  });
+
+  // Intent Donut
+  makeChart('intentDonutChart', {
+    type: 'doughnut',
+    data: {
+      labels: ['Conversion','Retention','Consideration','Awareness','Winback','Education'],
+      datasets: [{
+        data: [40,15,20,12,8,5],
+        backgroundColor: ['#f4506b','#f9a03f','#22d3a5','#4f8ef7','#fcd34d','#7b5ea7'].map(c=>c+'cc'),
+        borderWidth:0, hoverOffset:8,
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: { legend:{ position:'bottom', labels:{color:'#8b91a8',font:{size:10},padding:8,boxWidth:10} } },
+      cutout:'60%',
+    }
+  });
+
+  // Intent Performance
+  makeChart('intentPerformChart', {
+    type: 'bar',
+    data: {
+      labels: ['Awareness','Education','Consideration','Conversion','Retention','Winback'],
+      datasets: [
+        { label:'Revenue ($K)', data:[8.4,5.2,14.8,48.2,18.6,6.8], backgroundColor:'rgba(79,142,247,0.7)', borderRadius:5, borderSkipped:false },
+        { label:'Avg CTR %', data:[1.4,2.1,3.8,4.8,3.2,2.8], backgroundColor:'rgba(34,211,165,0.6)', borderRadius:5, borderSkipped:false },
+      ]
+    },
+    options: { ...baseChartDefaults }
+  });
+
+  // Post-Click Funnel
+  makeChart('funnelChart', {
+    type: 'bar',
+    data: {
+      labels: ['Sent','Delivered','Opened','Clicked','Session','ATC','Purchase'],
+      datasets: [{
+        label: 'Users',
+        data: [100,94,24,3.8,2.6,1.68,0.42].map(v=>v),
+        backgroundColor: [
+          'rgba(79,142,247,0.8)','rgba(79,142,247,0.7)','rgba(79,142,247,0.6)',
+          'rgba(34,211,165,0.7)','rgba(34,211,165,0.6)','rgba(249,160,63,0.7)','rgba(34,211,165,0.9)'
+        ],
+        borderRadius:6, borderSkipped:false,
+      }]
+    },
+    options: { ...baseChartDefaults, indexAxis:'y' }
+  });
+}
+
+function refreshAllCharts() {
+  // Re-init with slightly randomized data for demo
+  const jitter = () => (Math.random()-0.5)*0.1;
+  showToast('Charts refreshed.', 'success');
+}
+
+function updateRevChart(metric) {
+  const datasets = {
+    revenue: [45000,18000,8000,2000],
+    orders: [1820,640,210,44],
+    customers: [1240,480,160,32],
+  };
+  if (charts['revChannelChart']) {
+    charts['revChannelChart'].data.datasets[0].data = datasets[metric];
+    charts['revChannelChart'].data.datasets[0].label = metric.charAt(0).toUpperCase()+metric.slice(1);
+    charts['revChannelChart'].update();
+  }
+}
+
+// ===================== FLOW DETAIL =====================
+function openFlowDetail(id) {
+  showToast(`Opening ${id} flow detail…`, 'success');
+}
+
+// ===================== MANUAL ENTRY MODAL =====================
+function openModal(id) {
+  if (id === 'brandModal') renderBrandSwitcher();
+  if (id === 'manualEntryModal') { openModal('addCampaignModal'); return; }
+  document.getElementById(id).classList.add('open');
+}
+
+// ===================== INIT =====================
+window.addEventListener('load', () => {
+  initCharts();
+  renderCampaignTable();
+  
+  // Set today's date as default in date pickers
+  const today = new Date().toISOString().split('T')[0];
+  document.querySelectorAll('input[type="date"]').forEach(el => { if (!el.value) el.value = today; });
+});
+
+// Close dropdowns on click outside
+document.addEventListener('click', e => {
+  document.querySelectorAll('.dropdown-menu.open').forEach(m => {
+    if (!m.parentElement.contains(e.target)) m.classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
